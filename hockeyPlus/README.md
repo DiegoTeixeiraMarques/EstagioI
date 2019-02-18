@@ -1,19 +1,21 @@
-#Nome: HockeyPlus
+Primeiras descrições do jogo
 
-#Gênero: Esportes
+Nome: HockeyPlus
 
-#Público Alvo: Grupos de adolescentes que gostam de se reunir para disputar campeonatos de games
+Gênero: Esportes
 
-#Objetico Geral: Conseguir colocar o disco no gol adversário perpassando pelos desafios que se apresentam durante o jogo
+Público Alvo: Grupos de adolescentes que gostam de se reunir para disputar campeonatos de games
 
-#Objetivo Específico: Coletar, através de uma batida no disco de jogo, os objetos "plus" que aparecem em tela, e evitar coletar objetos "less" para atingir uma maior pontuação
+Objetivo Geral: Conseguir colocar o disco no gol adversário
 
-#Enredo: ...
+Objetivo Específico: Realizar contatos no disco de jogo para atingir o gol adversário, podendo também, coletar os objetos "plus" que aparecem em tela, e evitar coletar objetos "less" para atingir o nível 3 de coletas e utilizar ações a seu favor
 
-#Personagens/ Objetos de jogo: Duas argolas grandes que representam os jogadores e um disco pequeno equiparado a bola no futebol
+Enredo: ...
 
-#Interação dos jogadores: Jogam com o dedo indicador de preferência e buscam acertar o disco de diferentes formas e intensidade. Cada jogador tem metade da tela para defender e atacar
+Personagens/ Objetos de jogo: Dois discos grandes que representam os jogadores e um disco pequeno equiparado a bola no futebol
 
-#Controle:...
+Interação dos jogadores: Jogam com o dedo indicador de preferência e buscam acertar o disco de diferentes formas e intensidade. Cada jogador tem metade da tela para defender e atacar
+
+Controle: ...
 
 
