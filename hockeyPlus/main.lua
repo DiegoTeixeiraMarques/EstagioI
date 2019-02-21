@@ -1,10 +1,11 @@
+
 -- Retirando statusBar da tela
 display.setStatusBar( display.HiddenStatusBar )
 
 -- Adicionando física ao jogo sem gravidade
 local physics = require("physics")
 physics.start()
-physics.setGravity( 0, 0)
+physics.setGravity( 1, 1)
 
 local background
 local playerone
@@ -77,13 +78,13 @@ playertwo.myName = "playertwo"
 
 
 -- Adicionando física aos objetos
-physics.addBody( playerone, "static", {radius=38, bounce=2} )
-physics.addBody( playertwo, "static", {radius=38, bounce=2} )
-physics.addBody( disc, "dynamic", {radius=20, density = -5} )
-physics.addBody( bord1, "static", {density = 10.0, bounce = 2 })
-physics.addBody( bord2, "static", {density = 10.0, bouce = 2 })
-physics.addBody( bord3, "static", {density = 10.0, bounce = 2 })
-physics.addBody( bord4, "static", {density = 10.0, bounce = 2 })
+physics.addBody( playerone, "static", {radius=38, bounce = 0.5} )
+physics.addBody( playertwo, "static", {radius=38, bounce = 0.5} )
+physics.addBody( disc, "dynamic", {radius=20, density = 1, bounce = 0.5} )
+physics.addBody( bord1, "static", {density = 10.0, bounce = 0 })
+physics.addBody( bord2, "static", {density = 10.0, bouce = 0 })
+physics.addBody( bord3, "static", {density = 10.0, bounce = 0 })
+physics.addBody( bord4, "static", {density = 10.0, bounce = 0 })
 
 
 
@@ -144,8 +145,8 @@ local function onCollision(event)
 	if ( event.phase == "began" ) then
 		--if () then
         print( obj1.myName .. " and " .. event.object2.myName )
-        --obj2:applyLinearImpulse( 0.5, 1 )
-        obj2:applyForce( 18, 18, obj2.x, obj2.y )
+        --obj2:applyLinearImpulse( 0.1, 0.1 )
+        obj2:applyForce( 12, 12, obj2.x, obj2.y )
     --elseif ( event.phase == "ended" ) then
         --print( obj2.myName )
     end
@@ -153,7 +154,13 @@ local function onCollision(event)
 end
 
 
-playerone:addEventListener( "touch", dragShip )
-playertwo:addEventListener( "touch", dragShip2 )
 
-Runtime:addEventListener( "collision", onCollision )
+
+local function main()
+	playerone:addEventListener( "touch", dragShip )
+	playertwo:addEventListener( "touch", dragShip2 )
+
+	Runtime:addEventListener( "collision", onCollision )
+end
+
+main()
