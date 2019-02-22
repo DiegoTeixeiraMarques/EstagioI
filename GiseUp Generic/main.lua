@@ -18,7 +18,7 @@ physics.start()
 physics.setGravity( 0, 0)
 
 -- Definição de background
-background = display.newImageRect( "images/grama.png", 700, 1000 )
+background = display.newImageRect( "images/fundo1.png", 400, 1000 )
 background.x = display.contentCenterX
 background.y = display.contentCenterY
 background.myName = "background"
