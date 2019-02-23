@@ -20,15 +20,9 @@ display.setStatusBar(display.HiddenStatusBar)
 background = display.newImageRect( backGroup, "images/fundog.png", 3000, 3000 )
 background.x = xTela
 background.y = yTela
-background.myName = "bolha"
+background.myName = "background"
 
 
-
--- Debug de posição
-bolha = display.newImageRect( "images/bolha.png", 80, 80 )
-bolha.x = xTela * 2 - 50
-bolha.y = yTela * 2 - 30
-bolha.myName = "background"
 
 
 -- Sprite -------------------------------------------------
@@ -83,8 +77,8 @@ local velocity = 1
 
 local buttons = {}
 buttons[1] = display.newImageRect( "images/botao.png", 60, 50) -- Cima
-buttons[1].x = xTela / 2 
-buttons[1].y = yTela * 2 - 70
+buttons[1].x = xTela / 2  - 70
+buttons[1].y = yTela * 2 - 115
 buttons[1].rotation = - 90
 buttons[1].myName = "up"
 
@@ -107,6 +101,12 @@ buttons[4] = display.newImageRect( "images/botao.png", 60, 50) -- Direita
 buttons[4].x = buttons[3].x + 100
 buttons[4].y = buttons[3].y
 buttons[4].myName = "right"
+
+-- Debug de posição
+bolha = display.newImageRect( "images/bolha.png", 80, 80 )
+bolha.x = buttons[1].x + tamTela + 90
+bolha.y = buttons[2].y - 30
+bolha.myName = "bolha"
 
 
 local touchFunction = function(e)
