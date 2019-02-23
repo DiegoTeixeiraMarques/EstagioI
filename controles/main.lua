@@ -8,13 +8,15 @@ larTela = display.contentWidth
 backGroup = display.newGroup()
 buttonGroup = display.newGroup()
 
+local largura = 1.3 -- Espaço entre o player e as bordas da tela
+
 print(xTela, yTela, tamTela, larTela)
 display.setStatusBar(display.HiddenStatusBar)
 
 
 
 -- Definição de background
-background = display.newImageRect( backGroup, "images/fundo.png", 800, 800 )
+background = display.newImageRect( backGroup, "images/fundog.png", 1505, 1506 )
 background.x = display.contentCenterX
 background.y = display.contentCenterY
 background.myName = "background"
@@ -60,7 +62,7 @@ player:setSequence("idleUp")
 
 local passosX = 0
 local passosY = 0
-local velocity = 2
+local velocity = 3
 
 
 local buttons = {}
@@ -143,22 +145,37 @@ end
 
 
 local update = function()
-    --print("exec")
+    --print(player.width * .5)
 
     player.x = player.x + passosX
     player.y = player.y + passosY
 
-    if player.x <= player.width * .5 then
-        player.x = player.width * .5
-    elseif player.x >= larTela - player.width * .5 then
-        player.x = larTela - player.width * .5
+      
+    
+    -- Evita que o player saia da tela
+
+    if player.x <= player.width * largura then
+        player.x = player.width * largura
+        background.x =  background.x - passosX
+         
+    elseif player.x >= larTela - player.width * largura then
+        player.x = larTela - player.width * largura
+        background.x =  background.x - passosX
+    
     end
 
-    if player.y <= player.height * .5 then
-        player.y = player.height * .5
-    elseif player.y >= tamTela - player.height * .5 then
-        player.y = tamTela - player.height * .5
+    if player.y <= player.height * largura then
+        player.y = player.height * largura
+        background.y = background.y - passosY
+        
+    elseif player.y >= tamTela - player.height * largura then
+        player.y = tamTela - player.height * largura
+        background.y = background.y - passosY
+        
     end
+    
+    --background.x =  background.x - passosX
+    --background.y = background.y - passosY
 
     player:play() -- executa a animação
 
