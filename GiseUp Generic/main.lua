@@ -18,7 +18,7 @@ physics.start()
 physics.setGravity( 0, 0)
 
 -- Definição de background
-background = display.newImageRect( "images/fundo1.png", 400, 1000 )
+background = display.newImageRect( "images/testefundorpg.png", 731, 648 )
 background.x = display.contentCenterX
 background.y = display.contentCenterY
 background.myName = "background"
@@ -192,10 +192,10 @@ end
 --Runtime:addEventListener("enterFrame", nuvem2)
 --print(display.contentCenterY)
 
-background.enterFrame = scrollView
-background.enterFrame = scrollView
-Runtime:addEventListener("enterFrame", background)
-Runtime:addEventListener("enterFrame", background)
+--background.enterFrame = scrollView
+--background.enterFrame = scrollView
+--Runtime:addEventListener("enterFrame", background)
+--Runtime:addEventListener("enterFrame", background)
 
 
 local function dragShip( event )
@@ -318,7 +318,7 @@ local function gameLoop()
 end
 
 prot:addEventListener( "touch", dragShip )
-Runtime:addEventListener( "collision", onCollision )
+--Runtime:addEventListener( "collision", onCollision )
 
 
-gameLoopTimer = timer.performWithDelay( 200, gameLoop, 0 )
+--gameLoopTimer = timer.performWithDelay( 200, gameLoop, 0 )
