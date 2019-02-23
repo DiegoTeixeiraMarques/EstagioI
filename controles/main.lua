@@ -1,13 +1,33 @@
 local physics = require("physics")
 physics.start()
 physics.setGravity( 0, 0)
+system.activate("multitouch")
+--system.deactivate () 
+
 xTela = display.contentCenterX
 yTela = display.contentCenterY
 tamTela = display.contentHeight
 larTela = display.contentWidth
+
+-- Criando grupos
 backGroup = display.newGroup()
-buttonGroup = display.newGroup()
-personGroup = display.newGroup()
+cenarioGroup = display.newGroup()
+--moveGroup = display.newGroup()
+
+-- Alinhando os grupos em tela
+--backGroup.x = xTela
+--backGroup.y = yTela
+--cenarioGroup.x = xTela
+--cenarioGroup.y = yTela
+--moveGroup.x = xTela
+--moveGroup.y = yTela
+
+-- Atribuindo os grupos
+--backGroup:insert(cenarioGroup)
+cenarioGroup:insert(backGroup)
+--moveGroup:insert(backGroup)
+
+--moveGroup:insert(personGroup)
 
 largura = 1.3 -- Espaço entre o player e as bordas da tela
 
@@ -17,10 +37,15 @@ display.setStatusBar(display.HiddenStatusBar)
 
 
 -- Definição de background
-background = display.newImageRect( backGroup, "images/fundog.png", 3000, 3000 )
+background = display.newImageRect( backGroup, "images/fundog.png", 2000, 2000 )
 background.x = xTela
 background.y = yTela
 background.myName = "background"
+background.x = xTela
+background.y = yTela
+
+
+
 
 
 
@@ -48,21 +73,19 @@ local sequenceData = {
 
 -- Jogador
 local player = display.newSprite(sheet, sequenceData)
-player.x = xTela
+player.x = xTela - 150
 player.y = yTela
 player:setSequence("idleDown")
-personGroup:insert(player)
---[[
--- Intruso no campo
-local intruso = display.newSprite(sheet, sequenceData)
-intruso.x = xTela
-intruso.y = yTela
-intruso:setSequence("idleDown")
-intruso.x = xTela
-intruso.y = yTela + 100
-backGroup:insert(intruso)
---]]
-------------------------------------------------------------
+player.myName = "player"
+cenarioGroup:insert(player)
+physics.addBody( player, "dynamic", {radius=50, bounce = 20} )
+
+-- Criação da árvore
+arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 147 )
+arvore.x = xTela
+arvore.y = yTela
+arvore.myName = "arvore"
+physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
 
 
 
@@ -72,7 +95,7 @@ backGroup:insert(intruso)
 
 local passosX = 0
 local passosY = 0
-local velocity = 1
+local velocity = 10
 
 
 local buttons = {}
@@ -102,7 +125,7 @@ buttons[4].x = buttons[3].x + 100
 buttons[4].y = buttons[3].y
 buttons[4].myName = "right"
 
--- Debug de posição
+-- Debug de posição e controle de velocidade
 bolha = display.newImageRect( "images/bolha.png", 80, 80 )
 bolha.x = buttons[1].x + tamTela + 90
 bolha.y = buttons[2].y - 30
@@ -158,24 +181,58 @@ for j=1, #buttons do
     buttons[j]:addEventListener("touch", touchFunction)
 end
 
-
+-- Movimentação de cenário ------------------------------------------------
 
 local update = function()
     --print(player.width * .5)
 
     player.x = player.x + passosX
     player.y = player.y + passosY
-      
     
-    -- Evita que o player saia da tela
 
+
+    --- Teste de tela ----
+
+
+
+    -- Lado esquerdo
+    if player.x <= player.width and player.y <=player.height then
+        backGroup.x =  - player.x
+        backGroup.y = - player.y
+    end
+--[[
+    -- Lado direito
+    if player.x >= larTela - player.width then
+        cenarioGroup.x =  - player.x
+    end
+
+     -- Lado superior
+     if player.y <= player.height then
+        cenarioGroup.y = player.height
+    end
+
+    -- Lado inferior
+    
+    if player.y >= tamTela - player.height then
+        cenarioGroup.y = player.height
+     
+    end
+--]]
+------------------------ Fim teste -------------------------------------------
+
+
+
+    -- Evita que o player saia da tela
+    --[[
     -- Lado esquerdo
     if player.x <= player.width * largura then
         player.x = player.width * largura
 
         -- Verifica se a tela de jogo chegou ao fim
-        if background.x < 1400 then
-            background.x =  background.x - passosX
+        if backGroup.x < 1400 then
+            --moveGroup.x = moveGroup.x - passosX    
+            backGroup.x =  backGroup.x - passosX
+            --cenarioGroup.x =  cenarioGroup.x - passosX
         end
 
     -- Lado direito
@@ -183,8 +240,10 @@ local update = function()
         player.x = larTela - player.width * largura
 
         -- Verifica se a tela de jogo chegou ao fim
-        if background.x > -1100 then
-            background.x =  background.x - passosX
+        if backGroup.x > -900 then
+            --moveGroup.x = moveGroup.x - passosX  
+            backGroup.x =  backGroup.x - passosX
+            --cenarioGroup.x =  cenarioGroup.x - passosX
         end
 
     end
@@ -194,8 +253,11 @@ local update = function()
         player.y = player.height * largura
         
         -- Verifica se a tela de jogo chegou ao fim
-        if background.y < 1400 then
-            background.y = background.y - passosY
+        if backGroup.y < 1400 then
+            --moveGroup.y = moveGroup.y - passosY  
+            backGroup.y = backGroup.y - passosY
+            --cenarioGroup.y =  cenarioGroup.y - passosY
+            
         end
 
     -- Lado inferior
@@ -203,13 +265,15 @@ local update = function()
         player.y = tamTela - player.height * largura
 
         -- Verifica se a tela de jogo chegou ao fim
-        if background.y > -900 then
-            background.y = background.y - passosY
+        if backGroup.y > -900 then
+            --moveGroup.y = moveGroup.y - passosY  
+            backGroup.y = backGroup.y - passosY
+            --cenarioGroup.y =  cenarioGroup.y - passosY
         end
         
     end
     
-    
+    --]]
 
     --background.x =  background.x - passosX
     --background.y = background.y - passosY
@@ -218,27 +282,69 @@ local update = function()
 
 end
 
-velocityText = display.newText("Velocidade: " .. velocity, xTela, yTela / 4, native.systemFont, 36)
+------------------------------------------------------------------
+
+
+-- Colisões --------------------------------------------------------------------------------
+
+local function onCollision(event)
+	obj1 = event.object1
+	obj2 = event.object2
+
+	if ( event.phase == "began" ) then
+        print("Colisão inicial: " .. obj1.myName .. " e " .. obj2.myName)
+        obj2:applyForce( 12, 12, obj2.x, obj2.y )
+
+	elseif ( event.phase == "ended" ) then
+        print("Colisão final: " .. obj1.myName .. " e " .. obj2.myName)
+			
+	end
+
+        print("Encerramento: " .. obj1.myName .. " e " .. obj2.myName)
+end
+
+
+
+--velocityText = display.newText("Velocidade: " .. velocity, xTela, yTela / 4, native.systemFont, 36)
 
 local function limitedocampo(e)
-    --print(background.x)
-    --print(background.y)
-    --background:toBack()
+    
+    --personGroup:toBack()
     if e.phase == "began" then
 
+        print(" ----------------------------------------------- ")
+        print("Cenario Grupo X, Y: " .. cenarioGroup.x .. " - " .. cenarioGroup.y)
+        print("BackGroup X, Y: " .. backGroup.x .. " - " .. backGroup.y)
+        --print("MoveGroup X, Y: " .. moveGroup.x .. " - " .. moveGroup.y)
+        print("Background X, Y: " .. background.x .. " - " .. background.y)
+        print("Arvore X, Y: " .. arvore.x .. " - " .. arvore.y)
+        print("Player X, Y: " .. player.x .. " - " .. player.y)
+        
+        
+
+        --print("Arvore X, Y: " .. arvore.x .. " - " .. arvore.y)
+        --print("Arvore X, Y: " .. arvore.x .. " - " .. arvore.y)
+
+        print(" ----------------------------------------------- ")
+
+        --[[
         if velocity < 15 then
             velocity = velocity + 1
         else
             velocity = 1
         end
+        --]]
     end
-    velocityText.text = "Velocidade: " .. velocity
-
+        
+    --velocityText.text = "Velocidade: " .. velocity
+        
 end
 
 bolha:addEventListener("touch", limitedocampo)
 
 Runtime:addEventListener("enterFrame", update)  -- Enterframe evento disparado o tempo todo
+
+Runtime:addEventListener( "collision", onCollision )
 
 
 

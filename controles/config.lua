@@ -21,14 +21,4 @@ application =
 		--]]
 	},
 
-	orientation =
-	{
-		-- Supported values for orientation:
-		-- portrait, portraitUpsideDown, landscapeLeft, landscapeRight
-		
-		default = "landscapeLeft",    -- Initial launch orientation
-		--supported = { "portrait", "portraitUpsideDown" },  			  -- Table of allowed options for auto-orientation
-		supported = { "landscapeLeft" },    -- Limitado a uma posição
-	},
-
 }
