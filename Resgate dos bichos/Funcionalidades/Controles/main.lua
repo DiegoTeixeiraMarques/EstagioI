@@ -10,8 +10,13 @@ cenarioGroup:insert(backGroup) -- Atribuindo os grupos
 background = display.newImageRect( backGroup, "images/fundog.png", 3000, 3000 ) -- Definição de background
 background.x, background.y, background.myName = xTela, yTela, "background"
 
+-- Definindo som de fundo
+audio.setVolume( 0.3, { channel=1 } )
+trilhasonora = audio.loadSound( "audio/The Superiority.mp3" )
+audio.play(trilhasonora)
+
 local colision = false -- Variável para detecção de colisão
-local velocity = 2
+local velocity = 10
 local passosX = 0
 local passosY = 0
 
