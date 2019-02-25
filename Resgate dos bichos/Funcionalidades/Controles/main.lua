@@ -7,14 +7,15 @@ backGroup = display.newGroup() -- Criando grupos
 cenarioGroup = display.newGroup()
 cenarioGroup:insert(backGroup) -- Atribuindo os grupos
 
-background = display.newImageRect( backGroup, "images/fundog.png", 1000, 1000 ) -- Definição de background
+background = display.newImageRect( backGroup, "images/fundog.png", 3000, 3000 ) -- Definição de background
 background.x, background.y, background.myName = xTela, yTela, "background"
 
 local colision = false -- Variável para detecção de colisão
-local velocity = 10
+local velocity = 2
 local passosX = 0
 local passosY = 0
---velocityText = display.newText("Velocidade: " .. velocity, xTela, yTela / 4, native.systemFont, 36)
+
+velocityText = display.newText("Velocidade: " .. velocity, xTela, yTela / 4, native.systemFont, 36)
 
 -- Sprite -------------------------------------------------
 local sheetData={width=96, height=96, numFrames=96, sheetContentWidth=1152, sheetContentHeight=768 }  -- Máscara para sprite
@@ -38,9 +39,20 @@ backGroup:insert(player)
 physics.addBody( player, "dynamic", {radius=40, bounce = 20} )
 
 -- Criação da árvore
-arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 147 )
-arvore.x, arvore.y, arvore.myName = xTela, yTela + 250, "arvore"
-physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+for i = 2, 10, 2 do
+    -- Criação da árvore
+    arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
+    arvore.x, arvore.y, arvore.myName = xTela + i * 100, yTela + 250, "arvore"
+    physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+end
+
+for i = 2, 10, 2 do
+    -- Criação da árvore
+    arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
+    arvore.x, arvore.y, arvore.myName = xTela + i * 100, yTela + 500, "arvore"
+    physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+end
+
 
 -- Atribuindo botões -------------------------------------------------------------------------------
 local buttons = {}
@@ -103,21 +115,31 @@ buttons[4]:addEventListener("touch", touchFunction)
 -- Movimentação de cenário ------------------------------------------------
 local update = function()
        
+    x , y = player:localToContent(0 , 0)
     player.x = player.x + passosX
     player.y = player.y + passosY
     backGroup.x = backGroup.x - passosX
     backGroup.y = backGroup.y - passosY
+
+    if colision then
+        x, y = display.contentCenterX - x, display.contentCenterY - y
+		backGroup.x, backGroup.y = backGroup.x + x, backGroup.y + y
+end
     player:play() -- executa a animação
   
 end
 ----------------------------------------------------------------------------
 
+local function atualizaVelocidade()
+    velocityText.text = "Velocidade: " .. velocity
+end
+
 
 -- Colisões ----------------------------------------------------------------
 local function onCollision(event)
     obj1 = event.object1 
-    obj2 = event.object2 
-    
+    obj2 = event.object2
+    colision = true
     --cenarioGroup.x = player.x - 240
     --cenarioGroup.y = player.y - 160
     posicao = obj1:setSequence()
@@ -142,8 +164,14 @@ local function limitedocampo(e)
         print("Background X, Y: " .. background.x .. " - " .. background.y)
         print("Arvore X, Y: " .. arvore.x .. " - " .. arvore.y)
         print("Player X, Y: " .. player.x .. " - " .. player.y)
+       
+        print("To content PLayer: " .. x .." - " .. y)
         print(" ----------------------------------------------- ")
 
+        velocity = velocity + 1
+        
+        atualizaVelocidade()
+        
     end       
 end
 
