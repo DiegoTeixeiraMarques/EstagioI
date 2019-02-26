@@ -7,7 +7,7 @@ backGroup = display.newGroup() -- Criando grupos
 cenarioGroup = display.newGroup()
 cenarioGroup:insert(backGroup) -- Atribuindo os grupos
 
-background = display.newImageRect( backGroup, "images/fundog.png", 3000, 3000 ) -- Definição de background
+background = display.newImageRect( backGroup, "images/fundog.png", 800, 800 ) -- Definição de background
 background.x, background.y, background.myName = xTela, yTela, "background"
 
 -- Definindo som de fundo
@@ -16,14 +16,14 @@ trilhasonora = audio.loadSound( "audio/The Superiority.mp3" )
 audio.play(trilhasonora)
 
 local colision = false -- Variável para detecção de colisão
-local velocity = 10
+local velocity = 5
 local passosX = 0
 local passosY = 0
 
 velocityText = display.newText("Velocidade: " .. velocity, xTela, yTela / 4, native.systemFont, 36)
 
--- Sprite -------------------------------------------------
-local sheetData={width=96, height=96, numFrames=96, sheetContentWidth=1152, sheetContentHeight=768 }  -- Máscara para sprite
+-- Sprite Fantasma -------------------------------------------------
+local sheetData={width=48, height=48, numFrames=96 }  -- Máscara para sprite
 local sheet = graphics.newImageSheet("images/protetor.png", sheetData)                                -- Pega o sprite completo do personagem, todas as direções de acordo com a máscara
 local sequenceData = {
     { name = "idleDown", start = 9, count = 1, time = 0, loopCount = 1 },   -- parado para baixo
@@ -35,6 +35,29 @@ local sequenceData = {
     { name = "moveRight", start = 25, count = 8, time = 300, loopCount = 0 },   -- movendo para direita
     { name = "moveUp", start = 37, count = 8, time = 300, loopCount = 0 }   -- movendo para cima	
 }
+
+-- Sprite Joe -------------------------------------------------
+local sheetData2={width=203, height=206, numFrames=12, sheetContentWidth=610, sheetContentHeight=825 }  -- Máscara para sprite
+local sheet2 = graphics.newImageSheet("images/protetor.png", sheetData2)                                -- Pega o sprite completo do personagem, todas as direções de acordo com a máscara
+local sequenceData2 = {
+    { name = "idleDown", start = 10, count = 1, time = 0, loopCount = 1 },   -- parado para baixo
+    { name = "idleLeft", start = 1, count = 1, time = 0, loopCount = 1 },   -- parado para esquerda
+    { name = "idleRight", start = 4, count = 1, time = 0, loopCount = 1 },   -- parado para direita
+    { name = "idleUp", start = 7, count = 1, time = 0, loopCount = 1 },   -- parado para cima
+    { name = "moveDown", start = 11, count = 2, time = 300, loopCount = 0 },   -- movendo para baixo
+    { name = "moveLeft", start = 1, count = 3, time = 300, loopCount = 0 },   -- movendo para esquerda
+    { name = "moveRight", start = 4, count = 3, time = 300, loopCount = 0 },   -- movendo para direita
+    { name = "moveUp", start = 8, count = 2, time = 300, loopCount = 0 }   -- movendo para cima	
+}
+
+-- Joe
+--[[
+local player = display.newSprite(sheet2, sequenceData2)
+player.x, player.y, player.myName = xTela, yTela, "player"
+player:setSequence("idleDown")
+backGroup:insert(player)
+physics.addBody( player, "dynamic", {radius=40, bounce = 20} )
+--]]
 
 -- Jogador
 local player = display.newSprite(sheet, sequenceData)
@@ -123,13 +146,13 @@ local update = function()
     x , y = player:localToContent(0 , 0)
     player.x = player.x + passosX
     player.y = player.y + passosY
-    backGroup.x = backGroup.x - passosX
-    backGroup.y = backGroup.y - passosY
+    --backGroup.x = backGroup.x - passosX
+    --backGroup.y = backGroup.y - passosY
 
-    if colision then
+    --if colision then
         x, y = display.contentCenterX - x, display.contentCenterY - y
 		backGroup.x, backGroup.y = backGroup.x + x, backGroup.y + y
-end
+    --end
     player:play() -- executa a animação
   
 end
@@ -144,7 +167,7 @@ end
 local function onCollision(event)
     obj1 = event.object1 
     obj2 = event.object2
-    colision = true
+    --colision = true
     --cenarioGroup.x = player.x - 240
     --cenarioGroup.y = player.y - 160
     posicao = obj1:setSequence()
@@ -161,7 +184,7 @@ end
 local function limitedocampo(e)
     
     if e.phase == "began" then
-        
+        local X, Y = player:localToContent(0, 0)
         print(" ----------------------------------------------- ")
         print("Cenario Grupo X, Y: " .. cenarioGroup.x .. " - " .. cenarioGroup.y)
         print("BackGroup X, Y: " .. backGroup.x .. " - " .. backGroup.y)
@@ -169,6 +192,7 @@ local function limitedocampo(e)
         print("Background X, Y: " .. background.x .. " - " .. background.y)
         print("Arvore X, Y: " .. arvore.x .. " - " .. arvore.y)
         print("Player X, Y: " .. player.x .. " - " .. player.y)
+        print("Local to Content Player X, Y: " .. X .. " - " .. Y)
        
         print("To content PLayer: " .. x .." - " .. y)
         print(" ----------------------------------------------- ")
