@@ -7,7 +7,7 @@ backGroup = display.newGroup() -- Criando grupos
 cenarioGroup = display.newGroup()
 cenarioGroup:insert(backGroup) -- Atribuindo os grupos
 
-background = display.newImageRect( backGroup, "images/fundog.png", 2000, 2000 ) -- Definição de background
+background = display.newImageRect( backGroup, "images/fundog.png", 2500, 2500 ) -- Definição de background
 background.x, background.y, background.myName = xTela, yTela, "background"
 
 -- Definindo som de fundo
@@ -16,7 +16,7 @@ trilhasonora = audio.loadSound( "audio/The Superiority.mp3" )
 audio.play(trilhasonora)
 
 local colision = false -- Variável para detecção de colisão
-local velocity = 5
+local velocity = 3
 local passosX = 0
 local passosY = 0
 
@@ -51,7 +51,6 @@ local sequenceData2 = {
 }
 
 -- Joe
-
 local player = display.newSprite(sheet2, sequenceData2)
 player.x, player.y, player.myName = xTela, yTela, "player"
 player:setSequence("idleDown")
@@ -67,20 +66,35 @@ player:setSequence("idleDown")
 backGroup:insert(player)
 physics.addBody( player, "dynamic", {radius=40, bounce = 20} )
 --]]
--- Criação da árvore
-for i = 2, 10, 2 do
-    -- Criação da árvore
+
+
+
+-- Criação da árvore UP and Down
+for i = 2, 38, 2 do
     arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-    arvore.x, arvore.y, arvore.myName = xTela + i * 100, yTela + 250, "arvore"
+    arvore.x, arvore.y, arvore.myName = -1000 + xTela + i * 50, -1000 + yTela, "arvore"
     physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
 end
 
-for i = 2, 10, 2 do
-    -- Criação da árvore
+for i = 2, 38, 2 do
     arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-    arvore.x, arvore.y, arvore.myName = xTela + i * 100, yTela + 500, "arvore"
+    arvore.x, arvore.y, arvore.myName = -1000 + xTela + i * 50, 1000 + yTela, "arvore"
     physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
 end
+
+-- Criação da árvore Right and Left
+for i = 2, 38, 2 do
+    arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
+    arvore.x, arvore.y, arvore.myName = -1000 + xTela, -1000 + yTela + i * 50, "arvore"
+    physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+end
+
+for i = 2, 38, 2 do
+    arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
+    arvore.x, arvore.y, arvore.myName = 1000 + xTela, -1000 + yTela + i * 50, "arvore"
+    physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+end
+
 
 
 -- Atribuindo botões -------------------------------------------------------------------------------
