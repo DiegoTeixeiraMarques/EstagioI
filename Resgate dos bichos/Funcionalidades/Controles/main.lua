@@ -7,7 +7,7 @@ backGroup = display.newGroup() -- Criando grupos
 cenarioGroup = display.newGroup()
 cenarioGroup:insert(backGroup) -- Atribuindo os grupos
 
-background = display.newImageRect( backGroup, "images/fundog.png", 800, 800 ) -- Definição de background
+background = display.newImageRect( backGroup, "images/fundog.png", 2000, 2000 ) -- Definição de background
 background.x, background.y, background.myName = xTela, yTela, "background"
 
 -- Definindo som de fundo
@@ -37,8 +37,8 @@ local sequenceData = {
 }
 
 -- Sprite Joe -------------------------------------------------
-local sheetData2={width=203, height=206, numFrames=12, sheetContentWidth=610, sheetContentHeight=825 }  -- Máscara para sprite
-local sheet2 = graphics.newImageSheet("images/protetor.png", sheetData2)                                -- Pega o sprite completo do personagem, todas as direções de acordo com a máscara
+local sheetData2={width=47, height=48, numFrames=12} --sheetContentWidth=610, sheetContentHeight=825 }  -- Máscara para sprite
+local sheet2 = graphics.newImageSheet("images/joepngp.png", sheetData2)                                -- Pega o sprite completo do personagem, todas as direções de acordo com a máscara
 local sequenceData2 = {
     { name = "idleDown", start = 10, count = 1, time = 0, loopCount = 1 },   -- parado para baixo
     { name = "idleLeft", start = 1, count = 1, time = 0, loopCount = 1 },   -- parado para esquerda
@@ -51,21 +51,22 @@ local sequenceData2 = {
 }
 
 -- Joe
---[[
+
 local player = display.newSprite(sheet2, sequenceData2)
 player.x, player.y, player.myName = xTela, yTela, "player"
 player:setSequence("idleDown")
 backGroup:insert(player)
 physics.addBody( player, "dynamic", {radius=40, bounce = 20} )
---]]
+
 
 -- Jogador
+--[[
 local player = display.newSprite(sheet, sequenceData)
 player.x, player.y, player.myName = xTela, yTela, "player"
 player:setSequence("idleDown")
 backGroup:insert(player)
 physics.addBody( player, "dynamic", {radius=40, bounce = 20} )
-
+--]]
 -- Criação da árvore
 for i = 2, 10, 2 do
     -- Criação da árvore
