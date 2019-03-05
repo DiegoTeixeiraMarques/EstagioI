@@ -23,7 +23,7 @@ trilhasonora = audio.loadSound( "audio/The Superiority.mp3" )
 audio.play(trilhasonora)
 
 local colision = false -- Variável para detecção de colisão
-local velocity = 20
+local velocity = 3
 local passosX = 0
 local passosY = 0
 
@@ -62,26 +62,8 @@ local player = display.newSprite(sheet2, sequenceData2)
 player.x, player.y, player.myName = xTela, yTela, "player"
 player:setSequence("idleDown")
 backGroup:insert(player)
-physics.addBody( player, "dynamic", {radius=40, bounce = 20} )
+physics.addBody( player, "dynamic", {radius=30, bounce = 20} )
 
-
-arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-arvore.x, arvore.y, arvore.myName = xTela - background.width / 2 + arvore.width, yTela, "arvore"
-physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
-
-arvore2 = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-arvore2.x, arvore2.y, arvore2.myName = xTela + background.width / 2 - arvore2.width, yTela, "arvore"
-physics.addBody( arvore2, "static", {radius=50, bounce = 20, density = 20} )
-
-arvore3 = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-arvore3.x, arvore3.y, arvore3.myName = xTela, yTela - background.height / 2 + arvore3.height, "arvore"
-physics.addBody( arvore3, "static", {radius=50, bounce = 20, density = 20} )
-
-arvore4 = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-arvore4.x, arvore4.y, arvore4.myName = xTela, yTela + background.height / 2 - arvore4.height, "arvore"
-physics.addBody( arvore4, "static", {radius=50, bounce = 20, density = 20} )
-
---]]
 
 arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
 arvore.x, arvore.y, arvore.myName = xTela, yTela + 250, "arvore"
@@ -89,9 +71,40 @@ physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
 
 leftX = xTela - background.width / 2 + arvore.width * 1.5
 rightX = xTela + background.width / 2 - arvore.width * 1.5
-leftY = yTela - background.height / 2 + arvore.height * 1.5
-rightY = yTela + background.height / 2 - arvore.height * 1.5
+upY = yTela - background.height / 2 + arvore.height * 1.5
+downY = yTela + background.height / 2 - arvore.height * 1.5
 bosque = {}
+
+local function criarCercado()
+
+    -- em cima
+    for i = 1, 38, 1 do
+        cerca = display.newImageRect( backGroup, "images/cerca.png", 60, 60 )
+        cerca.x, cerca.y, cerca.myName = leftX + i * 65 , upY, "cerca"
+        physics.addBody( cerca, "static", {radius=30, bounce = 20, density = 20} )
+    end
+
+    -- lado esquerdo
+    for i = 1, 38, 1 do
+        cerca = display.newImageRect( backGroup, "images/cerca.png", 60, 60 )
+        cerca.x, cerca.y, cerca.myName = leftX, upY + i * 65, "cerca"
+        physics.addBody( cerca, "static", {radius=50, bounce = 20, density = 20} )
+    end
+
+    -- em baixo
+    for i = 1, 38, 1 do
+        cerca = display.newImageRect( backGroup, "images/cerca.png", 60, 60 )
+        cerca.x, cerca.y, cerca.myName = leftX + i * 65 , downY, "cerca"
+        physics.addBody( cerca, "static", {radius=50, bounce = 20, density = 20} )
+    end
+
+    -- lado direito
+    for i = 1, 38, 1 do
+        cerca = display.newImageRect( backGroup, "images/cerca.png", 60, 60 )
+        cerca.x, cerca.y, cerca.myName = rightX, upY + i * 65, "cerca"
+        physics.addBody( cerca, "static", {radius=50, bounce = 20, density = 20} )
+    end
+end
 
 table.insert(bosque, arvore)
 print(table.getn(bosque))
@@ -99,7 +112,7 @@ print(table.getn(bosque))
 
 local function gerarNumero()
     local X = math.random( leftX, rightX )
-    local Y = math.random( leftY, rightY )
+    local Y = math.random( upY, downY )
     return X, Y
 end
 
@@ -125,7 +138,7 @@ local function gerarArvore(qtd)
         if valid then
             arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
             arvore.x, arvore.y, arvore.myName = X, Y, "arvore"
-            physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+            physics.addBody( arvore, "static", {radius=40, bounce = 20, density = 20} )
             table.insert(bosque, arvore)
             print(table.getn(bosque))
         end
@@ -134,7 +147,9 @@ local function gerarArvore(qtd)
     print("Loops: " .. loops)
 end
 
+criarCercado()
 gerarArvore(50)
+
 
 
 -- Atribuindo botões -------------------------------------------------------------------------------
@@ -262,13 +277,3 @@ end
 bolha:addEventListener("touch", limitedocampo)
 Runtime:addEventListener("enterFrame", update)  -- Enterframe evento disparado o tempo todo
 Runtime:addEventListener( "collision", onCollision )
-
-
-
-
---crate1.collision = onLocalCollision
---crate1:addEventListener( "collision" )
-
-
-
-
