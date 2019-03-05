@@ -1,7 +1,4 @@
-local physics = require("physics")
-physics.start() physics.setGravity( 0, 0) system.activate("multitouch") display.setStatusBar(display.HiddenStatusBar) -- Configurações de jogo
-local easyMeasure = require "plugin.easyMeasure"
-math.randomseed( os.time() )
+local configuracoes = require("environment")
 
 xTela, yTela, tamTela, larTela = display.contentCenterX, display.contentCenterY, display.contentHeight,display.contentWidth -- Cordenadas da tela
 backGroup = display.newGroup() -- Criando grupos
@@ -11,23 +8,20 @@ cenarioGroup:insert(backGroup) -- Atribuindo os grupos
 background = display.newImageRect( backGroup, "images/fundog.png", 3000, 3000 ) -- Definição de background
 background.x, background.y, background.myName = xTela, yTela, "background"
 
---lago = display.newImageRect( backGroup, "images/fundoazul.png", 1000, 3000 ) -- Definição de background
---lago.x, lago.y, lago.myName = xTela - 1500 - lago.width / 2, background.y, "lago"
-
-
-
-
--- Definindo som de fundo
-audio.setVolume( 0.3, { channel=1 } )
-trilhasonora = audio.loadSound( "audio/The Superiority.mp3" )
-audio.play(trilhasonora)
-
-local colision = false -- Variável para detecção de colisão
 local velocity = 3
 local passosX = 0
 local passosY = 0
+local qtdChave = 0
+local velocityText = display.newText("Velocidade: " .. velocity, xTela - 120, yTela / 4, native.systemFont, 36)
+local chaveText = display.newText("Chaves: " .. qtdChave, xTela + 120, yTela / 4, native.systemFont, 36)
+local arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
 
-velocityText = display.newText("Velocidade: " .. velocity, xTela, yTela / 4, native.systemFont, 36)
+-- Qtd de objetos do cenário
+local numChave = 7
+local numArvore = 60
+local numJaula = 7
+-- -----------------------------------------------------------
+
 
 -- Sprite Fantasma -------------------------------------------------
 local sheetData={width=48, height=48, numFrames=96 }  -- Máscara para sprite
@@ -59,15 +53,14 @@ local sequenceData2 = {
 
 -- Joe
 local player = display.newSprite(sheet2, sequenceData2)
-player.x, player.y, player.myName = xTela, yTela, "player"
+player.x, player.y, player.myName = xTela, yTela, "joe"
 player:setSequence("idleDown")
 backGroup:insert(player)
 physics.addBody( player, "dynamic", {radius=30, bounce = 20} )
 
 
 arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-arvore.x, arvore.y, arvore.myName = xTela, yTela + 250, "arvore"
-physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+
 
 leftX = xTela - background.width / 2 + arvore.width * 1.5
 rightX = xTela + background.width / 2 - arvore.width * 1.5
@@ -82,6 +75,7 @@ local function criarCercado()
         cerca = display.newImageRect( backGroup, "images/cerca.png", 60, 60 )
         cerca.x, cerca.y, cerca.myName = leftX + i * 65 , upY, "cerca"
         physics.addBody( cerca, "static", {radius=30, bounce = 20, density = 20} )
+        table.insert(bosque, cerca)
     end
 
     -- lado esquerdo
@@ -89,6 +83,7 @@ local function criarCercado()
         cerca = display.newImageRect( backGroup, "images/cerca.png", 60, 60 )
         cerca.x, cerca.y, cerca.myName = leftX, upY + i * 65, "cerca"
         physics.addBody( cerca, "static", {radius=50, bounce = 20, density = 20} )
+        table.insert(bosque, cerca)
     end
 
     -- em baixo
@@ -96,6 +91,7 @@ local function criarCercado()
         cerca = display.newImageRect( backGroup, "images/cerca.png", 60, 60 )
         cerca.x, cerca.y, cerca.myName = leftX + i * 65 , downY, "cerca"
         physics.addBody( cerca, "static", {radius=50, bounce = 20, density = 20} )
+        table.insert(bosque, cerca)
     end
 
     -- lado direito
@@ -103,12 +99,11 @@ local function criarCercado()
         cerca = display.newImageRect( backGroup, "images/cerca.png", 60, 60 )
         cerca.x, cerca.y, cerca.myName = rightX, upY + i * 65, "cerca"
         physics.addBody( cerca, "static", {radius=50, bounce = 20, density = 20} )
+        table.insert(bosque, cerca)
     end
 end
 
 table.insert(bosque, arvore)
-print(table.getn(bosque))
-
 
 local function gerarNumero()
     local X = math.random( leftX, rightX )
@@ -129,9 +124,10 @@ local function validacao(X, Y)
     return valid
 end
 
-local function gerarArvore(qtd)
-   local loops = 1
-    while table.getn(bosque) <= qtd do    
+local function gerarArvore()
+    local qtd = 1
+    local loops = 1
+    while qtd <= numArvore do    
         X, Y = gerarNumero()
         valid = validacao(X, Y)
     
@@ -140,15 +136,59 @@ local function gerarArvore(qtd)
             arvore.x, arvore.y, arvore.myName = X, Y, "arvore"
             physics.addBody( arvore, "static", {radius=40, bounce = 20, density = 20} )
             table.insert(bosque, arvore)
-            print(table.getn(bosque))
+            qtd = qtd + 1
+        end
+        loops = loops + 1 
+    end
+    print("Loops: " .. loops)
+end
+
+local function gerarChave()
+    local loops = 1
+    local qtd = 1
+    while qtd <= numChave do    
+        X, Y = gerarNumero()
+        valid = validacao(X, Y)
+    
+        if valid then
+            chave = display.newImageRect( backGroup, "images/chave.png", 24, 24 )
+            chave.x, chave.y, chave.myName, chave.key = X, Y, "chave", qtd
+            physics.addBody( chave, "static", {radius=10, bounce = 20, density = -1} )
+            table.insert(bosque, chave)
+            qtd = qtd + 1
         end
         loops = loops + 1
     end
     print("Loops: " .. loops)
 end
 
+local function gerarJaula()
+    local loops = 1
+    local qtd = 1
+    while qtd <= numJaula do    
+        X, Y = gerarNumero()
+        valid = validacao(X, Y)
+        if valid then
+            jaula = display.newImageRect( backGroup, "images/jaula.png", 50, 50 )
+            jaula.x, jaula.y, jaula.myName = X, Y, qtd
+            physics.addBody( jaula, "static", {radius=18, bounce = 20, density = 5} )
+            table.insert(bosque, jaula)
+            qtd = qtd + 1
+        end
+        loops = loops + 1
+    end
+    print("Loops: " .. loops)
+end
+
+local function pegarChave()
+    qtdChave = qtdChave + 1
+    chaveText.text = "Chaves: " .. qtdChave
+end
+
 criarCercado()
-gerarArvore(50)
+gerarArvore()
+gerarChave()
+gerarJaula(6)
 
 
 
@@ -216,13 +256,8 @@ local update = function()
     x , y = player:localToContent(0 , 0)
     player.x = player.x + passosX
     player.y = player.y + passosY
-    --backGroup.x = backGroup.x - passosX
-    --backGroup.y = backGroup.y - passosY
-
-    --if colision then
-        x, y = display.contentCenterX - x, display.contentCenterY - y
-		backGroup.x, backGroup.y = backGroup.x + x, backGroup.y + y
-    --end
+    x, y = display.contentCenterX - x, display.contentCenterY - y
+	backGroup.x, backGroup.y = backGroup.x + x, backGroup.y + y
     player:play() -- executa a animação
   
 end
@@ -237,11 +272,18 @@ end
 local function onCollision(event)
     obj1 = event.object1 
     obj2 = event.object2
-    --colision = true
-    --cenarioGroup.x = player.x - 240
-    --cenarioGroup.y = player.y - 160
+   
     posicao = obj1:setSequence()
-	if ( event.phase == "began" ) then
+    if ( event.phase == "began" ) then
+        if (obj1.myName == "joe" and obj2.myName == "chave") then
+            if (qtdChave == numChave - 1) then
+                local msg = display.newText("Parabéns você encontrou todas as " .. numChave .. " chaves", xTela , yTela, native.systemFont, 24)
+            end
+            pegarChave()
+            print(obj2.key)
+            obj2:removeSelf()
+            
+        end
         print("Colisão inicial: " .. obj1.myName .. " e " .. obj2.myName)
 	elseif ( event.phase == "ended" ) then
         print("Colisão final: " .. obj1.myName .. " e " .. obj2.myName)	
