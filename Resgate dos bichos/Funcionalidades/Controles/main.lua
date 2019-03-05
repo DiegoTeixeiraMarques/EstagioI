@@ -1,14 +1,21 @@
 local physics = require("physics")
 physics.start() physics.setGravity( 0, 0) system.activate("multitouch") display.setStatusBar(display.HiddenStatusBar) -- Configurações de jogo
 local easyMeasure = require "plugin.easyMeasure"
+math.randomseed( os.time() )
 
 xTela, yTela, tamTela, larTela = display.contentCenterX, display.contentCenterY, display.contentHeight,display.contentWidth -- Cordenadas da tela
 backGroup = display.newGroup() -- Criando grupos
 cenarioGroup = display.newGroup()
 cenarioGroup:insert(backGroup) -- Atribuindo os grupos
 
-background = display.newImageRect( backGroup, "images/fundog.png", 2500, 2500 ) -- Definição de background
+background = display.newImageRect( backGroup, "images/fundog.png", 3000, 3000 ) -- Definição de background
 background.x, background.y, background.myName = xTela, yTela, "background"
+
+--lago = display.newImageRect( backGroup, "images/fundoazul.png", 1000, 3000 ) -- Definição de background
+--lago.x, lago.y, lago.myName = xTela - 1500 - lago.width / 2, background.y, "lago"
+
+
+
 
 -- Definindo som de fundo
 audio.setVolume( 0.3, { channel=1 } )
@@ -16,7 +23,7 @@ trilhasonora = audio.loadSound( "audio/The Superiority.mp3" )
 audio.play(trilhasonora)
 
 local colision = false -- Variável para detecção de colisão
-local velocity = 3
+local velocity = 20
 local passosX = 0
 local passosY = 0
 
@@ -58,43 +65,76 @@ backGroup:insert(player)
 physics.addBody( player, "dynamic", {radius=40, bounce = 20} )
 
 
--- Jogador
---[[
-local player = display.newSprite(sheet, sequenceData)
-player.x, player.y, player.myName = xTela, yTela, "player"
-player:setSequence("idleDown")
-backGroup:insert(player)
-physics.addBody( player, "dynamic", {radius=40, bounce = 20} )
+arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
+arvore.x, arvore.y, arvore.myName = xTela - background.width / 2 + arvore.width, yTela, "arvore"
+physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+
+arvore2 = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
+arvore2.x, arvore2.y, arvore2.myName = xTela + background.width / 2 - arvore2.width, yTela, "arvore"
+physics.addBody( arvore2, "static", {radius=50, bounce = 20, density = 20} )
+
+arvore3 = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
+arvore3.x, arvore3.y, arvore3.myName = xTela, yTela - background.height / 2 + arvore3.height, "arvore"
+physics.addBody( arvore3, "static", {radius=50, bounce = 20, density = 20} )
+
+arvore4 = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
+arvore4.x, arvore4.y, arvore4.myName = xTela, yTela + background.height / 2 - arvore4.height, "arvore"
+physics.addBody( arvore4, "static", {radius=50, bounce = 20, density = 20} )
+
 --]]
 
+arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
+arvore.x, arvore.y, arvore.myName = xTela, yTela + 250, "arvore"
+physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+
+leftX = xTela - background.width / 2 + arvore.width * 1.5
+rightX = xTela + background.width / 2 - arvore.width * 1.5
+leftY = yTela - background.height / 2 + arvore.height * 1.5
+rightY = yTela + background.height / 2 - arvore.height * 1.5
+bosque = {}
+
+table.insert(bosque, arvore)
+print(table.getn(bosque))
 
 
--- Criação da árvore UP and Down
-for i = 2, 38, 2 do
-    arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-    arvore.x, arvore.y, arvore.myName = -1000 + xTela + i * 50, -1000 + yTela, "arvore"
-    physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+local function gerarNumero()
+    local X = math.random( leftX, rightX )
+    local Y = math.random( leftY, rightY )
+    return X, Y
 end
 
-for i = 2, 38, 2 do
-    arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-    arvore.x, arvore.y, arvore.myName = -1000 + xTela + i * 50, 1000 + yTela, "arvore"
-    physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+local function validacao(X, Y)
+    local valid = true
+    for j = 1,  #bosque, 1 do
+        
+        if (X <= bosque[j].x + bosque[j].width) and (X >= bosque[j].x - bosque[j].width)
+            and (Y <= bosque[j].y + bosque[j].height) and (Y >= bosque[j].y - bosque[j].height) then
+            print("Contato")
+            valid = false
+        end
+    end
+    return valid
 end
 
--- Criação da árvore Right and Left
-for i = 2, 38, 2 do
-    arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-    arvore.x, arvore.y, arvore.myName = -1000 + xTela, -1000 + yTela + i * 50, "arvore"
-    physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+local function gerarArvore(qtd)
+   local loops = 1
+    while table.getn(bosque) <= qtd do    
+        X, Y = gerarNumero()
+        valid = validacao(X, Y)
+    
+        if valid then
+            arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
+            arvore.x, arvore.y, arvore.myName = X, Y, "arvore"
+            physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
+            table.insert(bosque, arvore)
+            print(table.getn(bosque))
+        end
+        loops = loops + 1
+    end
+    print("Loops: " .. loops)
 end
 
-for i = 2, 38, 2 do
-    arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-    arvore.x, arvore.y, arvore.myName = 1000 + xTela, -1000 + yTela + i * 50, "arvore"
-    physics.addBody( arvore, "static", {radius=50, bounce = 20, density = 20} )
-end
-
+gerarArvore(50)
 
 
 -- Atribuindo botões -------------------------------------------------------------------------------
