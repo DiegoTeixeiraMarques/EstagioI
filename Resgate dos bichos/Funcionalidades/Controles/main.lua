@@ -1,4 +1,12 @@
-local configuracoes = require("environment")
+local physics = require("physics")
+physics.start() physics.setGravity( 0, 0) system.activate("multitouch") display.setStatusBar(display.HiddenStatusBar) -- Configurações de jogo
+local easyMeasure = require "plugin.easyMeasure"
+math.randomseed( os.time() )
+
+-- Definindo som de fundo
+audio.setVolume( 0.3, { channel=1 } )
+trilhasonora = audio.loadSound( "audio/The Superiority.mp3" )
+audio.play(trilhasonora)
 
 xTela, yTela, tamTela, larTela = display.contentCenterX, display.contentCenterY, display.contentHeight,display.contentWidth -- Cordenadas da tela
 backGroup = display.newGroup() -- Criando grupos
@@ -14,7 +22,6 @@ local passosY = 0
 local qtdChave = 0
 local velocityText = display.newText("Velocidade: " .. velocity, xTela - 120, yTela / 4, native.systemFont, 36)
 local chaveText = display.newText("Chaves: " .. qtdChave, xTela + 120, yTela / 4, native.systemFont, 36)
-local arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
 
 -- Qtd de objetos do cenário
 local numChave = 7
@@ -56,16 +63,13 @@ local player = display.newSprite(sheet2, sequenceData2)
 player.x, player.y, player.myName = xTela, yTela, "joe"
 player:setSequence("idleDown")
 backGroup:insert(player)
-physics.addBody( player, "dynamic", {radius=30, bounce = 20} )
+physics.addBody( player, "dynamic", {radius=25, bounce = 20} )
 
 
-arvore = display.newImageRect( backGroup, "images/arvore2.png", 146, 160 )
-
-
-leftX = xTela - background.width / 2 + arvore.width * 1.5
-rightX = xTela + background.width / 2 - arvore.width * 1.5
-upY = yTela - background.height / 2 + arvore.height * 1.5
-downY = yTela + background.height / 2 - arvore.height * 1.5
+leftX = xTela - background.width / 2 + 146 * 1.5
+rightX = xTela + background.width / 2 - 146 * 1.5
+upY = yTela - background.height / 2 + 160 * 1.5
+downY = yTela + background.height / 2 - 160 * 1.5
 bosque = {}
 
 local function criarCercado()
@@ -102,8 +106,6 @@ local function criarCercado()
         table.insert(bosque, cerca)
     end
 end
-
-table.insert(bosque, arvore)
 
 local function gerarNumero()
     local X = math.random( leftX, rightX )
@@ -152,8 +154,8 @@ local function gerarChave()
     
         if valid then
             chave = display.newImageRect( backGroup, "images/chave.png", 24, 24 )
-            chave.x, chave.y, chave.myName, chave.key = X, Y, "chave", qtd
-            physics.addBody( chave, "static", {radius=10, bounce = 20, density = -1} )
+            chave.x, chave.y, chave.myName = X, Y, "chave"
+            physics.addBody( chave, "static", {radius=5, bounce = 20, density = -1} )
             table.insert(bosque, chave)
             qtd = qtd + 1
         end
@@ -185,10 +187,7 @@ local function pegarChave()
     chaveText.text = "Chaves: " .. qtdChave
 end
 
-criarCercado()
-gerarArvore()
-gerarChave()
-gerarJaula(6)
+
 
 
 
@@ -280,7 +279,6 @@ local function onCollision(event)
                 local msg = display.newText("Parabéns você encontrou todas as " .. numChave .. " chaves", xTela , yTela, native.systemFont, 24)
             end
             pegarChave()
-            print(obj2.key)
             obj2:removeSelf()
             
         end
@@ -315,6 +313,11 @@ local function limitedocampo(e)
         
     end       
 end
+
+criarCercado()
+gerarArvore()
+gerarChave()
+gerarJaula()
 
 bolha:addEventListener("touch", limitedocampo)
 Runtime:addEventListener("enterFrame", update)  -- Enterframe evento disparado o tempo todo
