@@ -11,22 +11,33 @@ audio.play(trilhasonora)
 xTela, yTela, tamTela, larTela = display.contentCenterX, display.contentCenterY, display.contentHeight,display.contentWidth -- Cordenadas da tela
 backGroup = display.newGroup() -- Criando grupos
 cenarioGroup = display.newGroup()
+menuGroup = display.newGroup()
 cenarioGroup:insert(backGroup) -- Atribuindo os grupos
 
 background = display.newImageRect( backGroup, "images/fundog.png", 3000, 3000 ) -- Definição de background
 background.x, background.y, background.myName = xTela, yTela, "background"
+menu = display.newImageRect(menuGroup, "images/menu.png", tamTela * 2.5, 500)
+menu.x, menu.y = xTela, yTela - 55
 
 local velocity = 3
+local lives = 3
 local passosX = 0
 local passosY = 0
 local qtdChave = 0
-local velocityText = display.newText("Velocidade: " .. velocity, xTela - 120, yTela / 4, native.systemFont, 36)
-local chaveText = display.newText("Chaves: " .. qtdChave, xTela + 120, yTela / 4, native.systemFont, 36)
+--local velocityText = display.newText("Velocidade: " .. velocity, xTela - 120, yTela / 4 - 10, native.systemFont, 36)
+local livesText = display.newText("Vidas: " .. lives, xTela - 120, yTela / 4 - 10, native.systemFont, 36)
+local chaveText = display.newText("Chaves: " .. qtdChave, xTela + 120, yTela / 4 - 10, native.systemFont, 36)
+
+menuGroup:insert(livesText)
+--menuGroup:insert(velocityText)
+menuGroup:insert(chaveText)
+
 
 -- Qtd de objetos do cenário
 local numChave = 7
 local numArvore = 60
 local numJaula = 7
+local numCacador = 50
 -- -----------------------------------------------------------
 
 
@@ -34,14 +45,10 @@ local numJaula = 7
 local sheetData={width=48, height=48, numFrames=96 }  -- Máscara para sprite
 local sheet = graphics.newImageSheet("images/protetor.png", sheetData)                                -- Pega o sprite completo do personagem, todas as direções de acordo com a máscara
 local sequenceData = {
-    { name = "idleDown", start = 9, count = 1, time = 0, loopCount = 1 },   -- parado para baixo
-    { name = "idleLeft", start = 21, count = 1, time = 0, loopCount = 1 },   -- parado para esquerda
-    { name = "idleRight", start = 33, count = 1, time = 0, loopCount = 1 },   -- parado para direita
-    { name = "idleUp", start = 45, count = 1, time = 0, loopCount = 1 },   -- parado para cima
-    { name = "moveDown", start = 1, count = 8, time = 300, loopCount = 0 },   -- movendo para baixo
-    { name = "moveLeft", start = 13, count = 8, time = 300, loopCount = 0 },   -- movendo para esquerda
-    { name = "moveRight", start = 25, count = 8, time = 300, loopCount = 0 },   -- movendo para direita
-    { name = "moveUp", start = 37, count = 8, time = 300, loopCount = 0 }   -- movendo para cima	
+    { name = "right", frames = { 25, 26, 27, 28, 29, 30, 31, 32, 33 }, time = 500, loopCount = 0 },
+    { name = "left", frames = { 13, 14, 15, 16, 17, 18, 19, 20, 21 } , time = 500, loopCount = 0 },
+    { name = "moveRight", start = 25, count = 9, time = 500, loopCount = 0 },
+    { name = "moveDown", start = 13, count = 9, time = 500, loopCount = 0 },
 }
 
 -- Sprite Joe -------------------------------------------------
@@ -64,6 +71,7 @@ player.x, player.y, player.myName = xTela, yTela, "joe"
 player:setSequence("idleDown")
 backGroup:insert(player)
 physics.addBody( player, "dynamic", {radius=25, bounce = 20} )
+player.chave = false
 
 
 leftX = xTela - background.width / 2 + 146 * 1.5
@@ -172,7 +180,7 @@ local function gerarJaula()
         valid = validacao(X, Y)
         if valid then
             jaula = display.newImageRect( backGroup, "images/jaula.png", 50, 50 )
-            jaula.x, jaula.y, jaula.myName = X, Y, qtd
+            jaula.x, jaula.y, jaula.myName = X, Y, "jaula"
             physics.addBody( jaula, "static", {radius=18, bounce = 20, density = 5} )
             table.insert(bosque, jaula)
             qtd = qtd + 1
@@ -182,10 +190,35 @@ local function gerarJaula()
     print("Loops: " .. loops)
 end
 
+
+local function gerarCacador()
+    
+    local qtd = 1
+    while qtd <= numCacador do    
+        X, Y = gerarNumero()
+        valid = validacao(X, Y)
+        if valid then
+            cacador = display.newSprite(sheet, sequenceData)
+            cacador.x, cacador.y, cacador.myName = X, Y, "cacador"
+            local H = math.random( 1, 2 )
+            local lado = {"right", "left"}
+            cacador: setSequence(lado[H])
+            cacador:play()
+            backGroup:insert(cacador)
+            physics.addBody( cacador, "dynamic", {radius=25, bounce = 5} )
+            qtd = qtd + 1
+        end
+        
+    end
+   
+end
+
 local function pegarChave()
     qtdChave = qtdChave + 1
     chaveText.text = "Chaves: " .. qtdChave
+    player.chave = true
 end
+
 
 
 
@@ -219,7 +252,7 @@ local touchFunction = function(e)
             passosY = velocity
             passosX = 0           -- Evita que o personagem ande na diagonal
         elseif direction == "right" then
-            player:setSequence("moveRight")    
+            player:setSequence("moveRight")
             passosX = velocity
             passosY = 0           -- Evita que o personagem ande na diagonal
         elseif direction == "left" then
@@ -258,6 +291,11 @@ local update = function()
     x, y = display.contentCenterX - x, display.contentCenterY - y
 	backGroup.x, backGroup.y = backGroup.x + x, backGroup.y + y
     player:play() -- executa a animação
+
+    if lives <= 0 then
+        local msg = display.newText("Game Over", xTela , yTela, native.systemFont, 52)
+        physics.pause()
+    end
   
 end
 ----------------------------------------------------------------------------
@@ -271,23 +309,45 @@ end
 local function onCollision(event)
     obj1 = event.object1 
     obj2 = event.object2
-   
-    posicao = obj1:setSequence()
+    print("Colisão inicial: " .. obj1.myName .. " e " .. obj2.myName)
+    --posicao = obj1:setSequence()
     if ( event.phase == "began" ) then
+
+        -- Colisão Player e Chave
         if (obj1.myName == "joe" and obj2.myName == "chave") then
-            if (qtdChave == numChave - 1) then
-                local msg = display.newText("Parabéns você encontrou todas as " .. numChave .. " chaves", xTela , yTela, native.systemFont, 24)
+
+            if obj1.chave == true then
+                --msg.text = "Você já tem uma chave, libere uma jaula!", xTela , yTela, native.systemFont, 24)
+                --transition.to(msg, { time=1500 })
+            elseif obj1.chave == false then
+                pegarChave()
+                obj2:removeSelf()
             end
-            pegarChave()
-            obj2:removeSelf()
-            
         end
-        print("Colisão inicial: " .. obj1.myName .. " e " .. obj2.myName)
-	elseif ( event.phase == "ended" ) then
-        print("Colisão final: " .. obj1.myName .. " e " .. obj2.myName)	
-	end
+    elseif (obj1.myName == "cacador" and obj2.myName == "arvore" or obj1.myName == "cacador" and obj2.myName == "cerca" ) then
+        
+        -- Tabela com os movimentos possiveis do caçador
+        local H = math.random( 1, 2 )
+        local lado = {"right", "left"}
+        obj1: setSequence(lado[H])
+
+    elseif (obj1.myName == "joe" and obj2.myName == "cacador" or obj1.myName == "cacador" and obj2.myName == "joe" ) then
+
+        -- Perde vida
+        lives = lives - 1
+        livesText.text = "Vidas: " .. lives
     
-    print("Encerramento: " .. obj1.myName .. " e " .. obj2.myName)
+    elseif (obj1.myName == "joe" and obj2.myName == "jaula" or obj1.myName == "jaula" and obj2.myName == "joe" ) then
+        --display.remove(msg)
+        if obj1.chave == true then
+            obj2:removeSelf()
+            player.chave = false
+            numJaula = numJaula - 1
+            if numJaula <= 0 then
+                local msg = display.newText("Parabéns, você liberou todos os animais!", xTela , yTela, native.systemFont, 24)
+            end
+        end
+	end
 end
 
 -- DEBUG DE POSIÇÔES
@@ -307,9 +367,18 @@ local function limitedocampo(e)
         print("To content PLayer: " .. x .." - " .. y)
         print(" ----------------------------------------------- ")
 
-        velocity = velocity + 1
-        
-        atualizaVelocidade()
+        --velocity = velocity + 1
+
+        if menuGroup.x == 3000 then
+
+            menuGroup.x, menuGroup.y = xTela - xTela, yTela - yTela
+            menuGroup:toFront()
+
+        else
+            menuGroup.x, menuGroup.y = 3000, 3000
+        end
+
+        --atualizaVelocidade()
         
     end       
 end
@@ -318,6 +387,9 @@ criarCercado()
 gerarArvore()
 gerarChave()
 gerarJaula()
+gerarCacador()
+
+--transition.to( cacador, { time=1500, alpha=0, x=(cacador.x-50), y=(cacador.y-50) } )
 
 bolha:addEventListener("touch", limitedocampo)
 Runtime:addEventListener("enterFrame", update)  -- Enterframe evento disparado o tempo todo
