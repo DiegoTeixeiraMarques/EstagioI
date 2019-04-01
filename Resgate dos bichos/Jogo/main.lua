@@ -34,7 +34,7 @@ menuGroup:insert(chaveText)
 
 
 -- Qtd de objetos do cenário
-local numChave = 7
+local numChave = 2
 local numArvore = 60
 local numJaula = 7
 local numCacador = 50
@@ -136,7 +136,6 @@ end
 
 local function gerarArvore()
     local qtd = 1
-    local loops = 1
     while qtd <= numArvore do    
         X, Y = gerarNumero()
         valid = validacao(X, Y)
@@ -148,13 +147,13 @@ local function gerarArvore()
             table.insert(bosque, arvore)
             qtd = qtd + 1
         end
-        loops = loops + 1 
+        
     end
-    print("Loops: " .. loops)
+   
 end
 
 local function gerarChave()
-    local loops = 1
+    
     local qtd = 1
     while qtd <= numChave do    
         X, Y = gerarNumero()
@@ -167,13 +166,13 @@ local function gerarChave()
             table.insert(bosque, chave)
             qtd = qtd + 1
         end
-        loops = loops + 1
+        
     end
-    print("Loops: " .. loops)
+   
 end
 
 local function gerarJaula()
-    local loops = 1
+    
     local qtd = 1
     while qtd <= numJaula do    
         X, Y = gerarNumero()
@@ -185,9 +184,8 @@ local function gerarJaula()
             table.insert(bosque, jaula)
             qtd = qtd + 1
         end
-        loops = loops + 1
+      
     end
-    print("Loops: " .. loops)
 end
 
 
@@ -310,7 +308,6 @@ local function onCollision(event)
     obj1 = event.object1 
     obj2 = event.object2
     print("Colisão inicial: " .. obj1.myName .. " e " .. obj2.myName)
-    --posicao = obj1:setSequence()
     if ( event.phase == "began" ) then
 
         -- Colisão Player e Chave
@@ -323,28 +320,29 @@ local function onCollision(event)
                 pegarChave()
                 obj2:removeSelf()
             end
-        end
-    elseif (obj1.myName == "cacador" and obj2.myName == "arvore" or obj1.myName == "cacador" and obj2.myName == "cerca" ) then
+        
+        elseif (obj1.myName == "cacador" and obj2.myName == "arvore" or obj1.myName == "cacador" and obj2.myName == "cerca" ) then
         
         -- Tabela com os movimentos possiveis do caçador
-        local H = math.random( 1, 2 )
-        local lado = {"right", "left"}
-        obj1: setSequence(lado[H])
+            local H = math.random( 1, 2 )
+            local lado = {"right", "left"}
+            obj1: setSequence(lado[H])
 
-    elseif (obj1.myName == "joe" and obj2.myName == "cacador" or obj1.myName == "cacador" and obj2.myName == "joe" ) then
+        elseif (obj1.myName == "joe" and obj2.myName == "cacador" or obj1.myName == "cacador" and obj2.myName == "joe" ) then
 
         -- Perde vida
         lives = lives - 1
         livesText.text = "Vidas: " .. lives
     
-    elseif (obj1.myName == "joe" and obj2.myName == "jaula" or obj1.myName == "jaula" and obj2.myName == "joe" ) then
-        --display.remove(msg)
-        if obj1.chave == true then
-            obj2:removeSelf()
-            player.chave = false
-            numJaula = numJaula - 1
-            if numJaula <= 0 then
-                local msg = display.newText("Parabéns, você liberou todos os animais!", xTela , yTela, native.systemFont, 24)
+        elseif (obj1.myName == "joe" and obj2.myName == "jaula" or obj1.myName == "jaula" and obj2.myName == "joe" ) then
+            --display.remove(msg)
+            if obj1.chave == true then
+                obj2:removeSelf()
+                player.chave = false
+                numJaula = numJaula - 1
+                if numJaula <= 0 then
+                    local msg = display.newText("Parabéns, você liberou todos os animais!", xTela , yTela, native.systemFont, 24)
+                end
             end
         end
 	end
