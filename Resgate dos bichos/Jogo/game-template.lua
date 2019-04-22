@@ -4,7 +4,7 @@ local scene = composer.newScene()
 
 
 local physics = require("physics")
-physics.start() 
+physics.start()
 physics.setGravity( 0, 0) 
 system.activate("multitouch") 
 display.setStatusBar(display.HiddenStatusBar) -- Configurações de jogo
@@ -23,6 +23,7 @@ local lives = 3
 local passosX = 0
 local passosY = 0
 local qtdChave = 0
+local cacadores = {}
 
 -- Qtd de objetos do cenário
 local numChave = 7
@@ -165,11 +166,13 @@ local function gerarCacador()
             cacador.x, cacador.y, cacador.myName = X, Y, "cacador"
             local H = math.random( 1, 2 )
             local lado = {"right", "left"}
-            cacador: setSequence(lado[H])
+            cacador:setSequence(lado[H])
             cacador:play()
             backGroup:insert(cacador)
-            physics.addBody( cacador, "dynamic", {radius=25, bounce = 5} )
+            physics.addBody( cacador, "dynamic", {radius=15, bounce = 5} )
             qtd = qtd + 1
+            -- adiciona cacadores a uma tabela para movimenta-los
+            table.insert(cacadores, cacador)
         end
     end
 end
@@ -238,6 +241,30 @@ local update = function()
     backGroup.x, backGroup.y = backGroup.x + x, backGroup.y + y
     player:play() -- executa a animação do personagem principal
 
+    
+    for j = 1,  #cacadores, 1 do
+        local H = math.random( 1, 4 )
+        if H == 1 then
+            for i = 1, 30, 1 do
+                cacadores[j].x = cacadores[j].x - 0.5
+            end
+        --elseif H == 2 then
+            --for i = 1, 10, 1 do 
+           --     cacadores[j].y = cacadores[j].y - 0.5
+           -- end
+        
+        elseif H == 3 then
+            for i = 1, 30, 1 do
+                cacadores[j].x = cacadores[j].x + 0.5
+            end
+       --elseif H == 4 then
+         --   for i = 1, 38, 1 do
+          --      cacadores[j].y = cacadores[j].y + 0.5
+          --  end
+            
+        end 
+    end
+
     -- Decrement the number of seconds
     secondsLeft = secondsLeft - 1
     -- Time is tracked in seconds; convert it to minutes and seconds
@@ -253,11 +280,12 @@ local update = function()
     end
 end
 
+
 -- Colisões ----------------------------------------------------------------
 local function onCollision(event)
     obj1 = event.object1 
     obj2 = event.object2
-    --print("Colisão inicial: " .. obj1.myName .. " e " .. obj2.myName)
+    print("Colisão inicial: " .. obj1.myName .. " e " .. obj2.myName)
     if ( event.phase == "began" ) then
 
         -- Colisão Player e Chave
@@ -276,13 +304,12 @@ local function onCollision(event)
         -- Tabela com os movimentos possiveis do caçador
             local H = math.random( 1, 2 )
             local lado = {"right", "left"}
-            obj1: setSequence(lado[H])
+            obj1:setSequence(lado[H])
 
         elseif (obj1.myName == "joe" and obj2.myName == "cacador" or obj1.myName == "cacador" and obj2.myName == "joe" ) then
-
-        -- Perde vida
-        lives = lives - 1
-        livesText.text = "vidas: " .. lives
+            -- Perde vida
+            lives = lives - 1
+            livesText.text = "vidas: " .. lives
     
         elseif (obj1.myName == "joe" and obj2.myName == "jaula" or obj1.myName == "jaula" and obj2.myName == "joe" ) then
             --display.remove(msg)
@@ -291,7 +318,7 @@ local function onCollision(event)
                 player.chave = false
                 numJaula = numJaula - 1
                 if numJaula <= 0 then
-                    local msg = display.newText("Parabéns, você liberou todos os animais!", xTela , yTela, "Mario-Kart-DS", 24)
+                    local msg = display.newText("PARABENS, VOCE LIBEROU TODOS OS ANIMAIS!", xTela , yTela, "Mario-Kart-DS", 24)
                 end
             end
         end
@@ -361,7 +388,7 @@ function scene:create( event )
     player.x, player.y, player.myName = xTela, yTela, "joe"
     player:setSequence("idleDown")
     backGroup:insert(player)
-    physics.addBody( player, "dynamic", {radius=25, bounce = 20} )
+    physics.addBody( player, "dynamic", {radius=18, bounce = 20} )
     player.chave = false
 
     leftX = xTela - background.width / 2 + 146 * 1.5
@@ -399,7 +426,8 @@ function scene:show( event )
 
     elseif ( phase == "did" ) then
         
-		Runtime:addEventListener("enterFrame", update)  -- Enterframe evento disparado o tempo todo
+        Runtime:addEventListener("enterFrame", update)  -- Enterframe evento disparado o tempo todo
+        --Runtime:addEventListener( "enterFrame", movimentoCacador )
         Runtime:addEventListener( "collision", onCollision )
 
 	end
@@ -433,6 +461,5 @@ scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
-
 
 return scene
