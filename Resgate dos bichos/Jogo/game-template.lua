@@ -18,7 +18,7 @@ menuGroup = display.newGroup()
 controlesGroup = display.newGroup()
 
 -- Variaveis de jogo
-local velocity = 5
+local velocity = 4
 local lives = 3
 local passosX = 0
 local passosY = 0
@@ -29,7 +29,7 @@ local cacadores = {}
 local numChave = 7
 local numArvore = 60
 local numJaula = 7
-local numCacador = 50
+local numCacador = 30
 -- -----------------------------------------------------------
 
 -- Sprite Fantasma -------------------------------------------------
@@ -38,6 +38,8 @@ local sheet = graphics.newImageSheet("images/protetor.png", sheetData)          
 local sequenceData = {
     { name = "right", frames = { 25, 26, 27, 28, 29, 30, 31, 32, 33 }, time = 500, loopCount = 0 },
     { name = "left", frames = { 13, 14, 15, 16, 17, 18, 19, 20, 21 } , time = 500, loopCount = 0 },
+    { name = "up", frames = { 37, 38, 39, 40, 41, 42, 43, 44, 45 } , time = 500, loopCount = 0 },
+    { name = "dowm", frames = { 1, 2, 3, 4, 5, 6, 7, 8, 9 } , time = 500, loopCount = 0 },
     { name = "moveRight", start = 25, count = 9, time = 500, loopCount = 0 },
     { name = "moveDown", start = 13, count = 9, time = 500, loopCount = 0 },
 }
@@ -149,7 +151,7 @@ local function gerarJaula()
         if valid then
             jaula = display.newImageRect( backGroup, "images/jaula.png", 50, 50 )
             jaula.x, jaula.y, jaula.myName = X, Y, "jaula"
-            physics.addBody( jaula, "static", {radius=18, bounce = 20, density = 5} )
+            physics.addBody( jaula, "static", {radius=18, bounce = 20, density = 10} )
             table.insert(bosque, jaula)
             qtd = qtd + 1
         end
@@ -164,8 +166,8 @@ local function gerarCacador()
         if valid then
             cacador = display.newSprite(sheet, sequenceData)
             cacador.x, cacador.y, cacador.myName = X, Y, "cacador"
-            local H = math.random( 1, 2 )
-            local lado = {"right", "left"}
+            local H = math.random( 1, 4 )
+            local lado = {"right", "left", "up", "dowm"}
             cacador:setSequence(lado[H])
             cacador:play()
             backGroup:insert(cacador)
@@ -176,6 +178,7 @@ local function gerarCacador()
         end
     end
 end
+
 
 local function pegarChave()
     qtdChave = qtdChave + 1
@@ -232,6 +235,21 @@ function endGame()
     composer.gotoScene("menu", { time=800, effect="crossFade" } )					
 end
 
+-- Funçaõ chamada após contato com caçador
+local function restorePlayer()
+
+	player.isBodyActive = false
+
+	-- Fade in the ship
+	transition.to(player, {alpha=1, time=500, 
+		onComplete = 
+		function()
+			player.isBodyActive = true
+			died = false
+		end})
+end
+
+
 -- Movimentação de cenário ------------------------------------------------
 local update = function()
     x , y = player:localToContent(0 , 0)
@@ -241,29 +259,6 @@ local update = function()
     backGroup.x, backGroup.y = backGroup.x + x, backGroup.y + y
     player:play() -- executa a animação do personagem principal
 
-    
-    for j = 1,  #cacadores, 1 do
-        local H = math.random( 1, 4 )
-        if H == 1 then
-            for i = 1, 30, 1 do
-                cacadores[j].x = cacadores[j].x - 0.5
-            end
-        --elseif H == 2 then
-            --for i = 1, 10, 1 do 
-           --     cacadores[j].y = cacadores[j].y - 0.5
-           -- end
-        
-        elseif H == 3 then
-            for i = 1, 30, 1 do
-                cacadores[j].x = cacadores[j].x + 0.5
-            end
-       --elseif H == 4 then
-         --   for i = 1, 38, 1 do
-          --      cacadores[j].y = cacadores[j].y + 0.5
-          --  end
-            
-        end 
-    end
 
     -- Decrement the number of seconds
     secondsLeft = secondsLeft - 1
@@ -285,7 +280,7 @@ end
 local function onCollision(event)
     obj1 = event.object1 
     obj2 = event.object2
-    print("Colisão inicial: " .. obj1.myName .. " e " .. obj2.myName)
+    --print("Colisão inicial: " .. obj1.myName .. " e " .. obj2.myName)
     if ( event.phase == "began" ) then
 
         -- Colisão Player e Chave
@@ -310,6 +305,8 @@ local function onCollision(event)
             -- Perde vida
             lives = lives - 1
             livesText.text = "vidas: " .. lives
+            player.alpha = 0.3
+			timer.performWithDelay( 500, restorePlayer )
     
         elseif (obj1.myName == "joe" and obj2.myName == "jaula" or obj1.myName == "jaula" and obj2.myName == "joe" ) then
             --display.remove(msg)
@@ -348,7 +345,7 @@ function scene:create( event )
     
     background = display.newImageRect( backGroup, "images/fundog.png", 3000, 3000 ) -- Definição de background
     background.x, background.y, background.myName = xTela, yTela, "background"
-    menu = display.newImageRect(menuGroup, "images/menu2.png", tamTela * 2.5, 500)
+    menu = display.newImageRect(menuGroup, "images/menu2.png", tamTela * 3, 500)
     menu.x, menu.y = xTela, yTela - 55
 
     -- Atribuindo botões -------------------------------------------------------------------------------
@@ -410,6 +407,7 @@ function scene:create( event )
     gerarChave()
     gerarJaula()
     gerarCacador()
+    --gerarCacador2()
 
     bolha:addEventListener("touch", menuStatus)
 end
@@ -425,10 +423,11 @@ function scene:show( event )
 		-- #########
 
     elseif ( phase == "did" ) then
-        
         Runtime:addEventListener("enterFrame", update)  -- Enterframe evento disparado o tempo todo
-        --Runtime:addEventListener( "enterFrame", movimentoCacador )
         Runtime:addEventListener( "collision", onCollision )
+        movimento = require( "gerador" )
+        movimentoCacador(cacadores)
+        
 
 	end
 end
