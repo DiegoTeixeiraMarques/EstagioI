@@ -39,7 +39,7 @@ local sequenceData = {
     { name = "right", frames = { 25, 26, 27, 28, 29, 30, 31, 32, 33 }, time = 500, loopCount = 0 },
     { name = "left", frames = { 13, 14, 15, 16, 17, 18, 19, 20, 21 } , time = 500, loopCount = 0 },
     { name = "up", frames = { 37, 38, 39, 40, 41, 42, 43, 44, 45 } , time = 500, loopCount = 0 },
-    { name = "dowm", frames = { 1, 2, 3, 4, 5, 6, 7, 8, 9 } , time = 500, loopCount = 0 },
+    { name = "down", frames = { 1, 2, 3, 4, 5, 6, 7, 8, 9 } , time = 500, loopCount = 0 },
     { name = "moveRight", start = 25, count = 9, time = 500, loopCount = 0 },
     { name = "moveDown", start = 13, count = 9, time = 500, loopCount = 0 },
 }
@@ -167,7 +167,7 @@ local function gerarCacador()
             cacador = display.newSprite(sheet, sequenceData)
             cacador.x, cacador.y, cacador.myName = X, Y, "cacador"
             local H = math.random( 1, 4 )
-            local lado = {"right", "left", "up", "dowm"}
+            local lado = {"right", "left", "up", "down"}
             cacador:setSequence(lado[H])
             cacador:play()
             backGroup:insert(cacador)
