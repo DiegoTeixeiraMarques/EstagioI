@@ -1,16 +1,13 @@
 local composer = require("composer")
 
--- Hide status bar
+-- Desabilita a barra de Status
 display.setStatusBar(display.HiddenStatusBar)
 
--- Seed the random number generator
-math.randomseed( os.time() )
+-- Reserve channel 1 para música de fundo
+audio.reserveChannels( 1, 2 )
 
--- Reserve channel 1 for background music
-audio.reserveChannels( 1 )
+-- Intensidade do volume do som
+audio.setVolume( 0.5, { channel = 1, 2 } )
 
--- Reduce the overall volume of the channel
-audio.setVolume( 0.5, { channel=1 } )
-
--- Go to the menu screen
+-- Vai para o menu
 composer.gotoScene("menu", {time=800, effect="crossFade"})
