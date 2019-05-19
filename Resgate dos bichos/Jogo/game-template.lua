@@ -28,6 +28,7 @@ local passosX = 0                      -- Variável para controlar a movimentaç
 local passosY = 0                      -- Variável para controlar a movimentação do player no eixo Y
 local qtdChave = 0                     -- Informa a quantiade de chaves já coletadas no jogo
 local cacadores = {}                   -- Tabela para adicionar todos os caçadores gerados e enviar para o arquivo "gerador.lua" fazer a movimentação deles
+local tempo = 500
 
 -- Quantidade de objetos do cenário
 local numChave = 7                     -- Quantidade de chaves criadas no início do jogo
@@ -62,6 +63,23 @@ local sequenceData2 = {
     { name = "moveRight", start = 4, count = 3, time = 300, loopCount = 0 },    -- Movendo para direita
     { name = "moveUp", start = 8, count = 2, time = 300, loopCount = 0 }        -- Movendo para cima	
 }
+
+-- Sprite dos animais
+local sequenceData3 = {
+    { name = "right", frames = { 25, 26, 27 }, time = 800, loopCount = 0 }, -- Sprite para direita
+    { name = "left", frames = { 13, 14, 15 } , time = 800, loopCount = 0 }, -- Sprite para esquerda
+    { name = "up", frames = { 37, 38, 39 } , time = 800, loopCount = 0 },   -- Sprite para cima
+    { name = "down", frames = { 1, 2, 3 } , time = 800, loopCount = 0 },          -- Sprite para baixo
+}
+
+-- Folhas de sprite dos animais
+local sheetAraraAzul = graphics.newImageSheet("images/arara-azul.png", sheetData)
+local sheetLoboGuara = graphics.newImageSheet("images/lobo-guara.png", sheetData)
+local sheetMacacoAranha = graphics.newImageSheet("images/macaco-aranha.png", sheetData)
+local sheetOncaPintada = graphics.newImageSheet("images/onça-pintada.png", sheetData)
+local sheetGuaruba = graphics.newImageSheet("images/arara-azul.png", sheetData)
+local sheetMicoLeaoDourado = graphics.newImageSheet("images/macaco-aranha.png", sheetData)
+local sheetTartarugaOliva = graphics.newImageSheet("images/tartaruga-oliva.png", sheetData)
 
 
 -- ########
@@ -149,11 +167,9 @@ end
 -- Chamada após o gameOver
 function endGame()	
     -- Redireciona para tela de menu
-    Runtime:removeEventListener( "enterFrame", update )
-    Runtime:removeEventListener( "collision", onCollision )
     physics.pause()
-    audio.stop( trilhasonora )
-    composer.removeScene("game")								
+
+    composer.removeScene("score")								
     composer.gotoScene("menu", { time=800, effect="crossFade" } )					
 end
 
@@ -177,18 +193,16 @@ local update = function()
     backGroup.x, backGroup.y = backGroup.x + x, backGroup.y + y
     player:play() -- executa a animação do personagem principal
 
-
-    -- Decrement the number of seconds
-    secondsLeft = secondsLeft - 1
-    -- Time is tracked in seconds; convert it to minutes and seconds
-    local minutes = math.floor( secondsLeft / 60 )
-    -- Make it a formatted string
-    local timeDisplay = string.format( "%02d", minutes )
-    -- Update the text object
-    clockText.text = timeDisplay
-
 end
 
+local cronometro = function()
+    tempo = tempo - 1
+    tempoText.text = tempo
+
+    if tempo <= 0 then
+        endgame()
+    end
+end
 
 -- ########
 
@@ -234,9 +248,6 @@ local function gerarCacador()
         if valid then
             cacador = display.newSprite(sheet, sequenceData)
             cacador.x, cacador.y, cacador.myName = X, Y, "cacador"
-            --local H = math.random( 1, 4 )
-            --local lado = {"right", "left", "up", "down"}
-            --cacador:setSequence(lado[H])
             backGroup:insert(cacador)
             physics.addBody( cacador, "dynamic", {radius=15, bounce = 5, density = 50} )
             qtd = qtd + 1
@@ -286,7 +297,7 @@ local function gerarJaula()
         valid = validacao(X, Y)
         if valid then
             jaula = display.newImageRect( backGroup, "images/jaula.png", 50, 50 )
-            jaula.x, jaula.y, jaula.myName = X, Y, "jaula"
+            jaula.x, jaula.y, jaula.myName, jaula.number = X, Y, "jaula", qtd
             physics.addBody( jaula, "static", {radius=18, bounce = 20, density = 50} )
             table.insert(bosque, jaula)
             qtd = qtd + 1
@@ -321,12 +332,54 @@ local function onCollision(event)
                 endGame()
             end
     
-        elseif (obj1.myName == "joe" and obj2.myName == "jaula" or obj1.myName == "jaula" and obj2.myName == "joe" ) then
+        elseif (obj1.myName == "joe" and obj2.myName == "jaula") then
             
             if obj1.chave == true then
+                
+                if obj2.number == 1 then
+                    animal = display.newSprite(sheetAraraAzul, sequenceData3)
+                    araraAzul.alpha = 1
+                elseif obj2.number == 2 then 
+                    animal = display.newSprite(sheetLoboGuara, sequenceData3)
+                    loboGuara.alpha = 1
+                elseif obj2.number == 3 then 
+                    animal = display.newSprite(sheetMacacoAranha, sequenceData3)
+                    macacoAranha.alpha = 1
+                elseif obj2.number == 4 then 
+                    animal = display.newSprite(sheetOncaPintada, sequenceData3)
+                    oncaPintada.alpha = 1
+                elseif obj2.number == 5 then 
+                    animal = display.newSprite(sheetGuaruba, sequenceData3)
+                    guaruba.alpha = 1
+                elseif obj2.number == 6 then 
+                    animal = display.newSprite(sheetMicoLeaoDourado, sequenceData3)
+                    micoLeaoDourado.alpha = 1
+                elseif obj2.number == 7 then 
+                    animal = display.newSprite(sheetTartarugaOliva, sequenceData3)
+                    tartarugaOliva.alpha = 1
+                end
+                   
+                animal.x, animal.y = obj2.x, obj2.y
+                local H = math.random( 1, 4 )
+                local lado = {"right", "left", "up", "down"}
+                animal:setSequence(lado[H])
+                backGroup:insert(animal)
+                animal:play()
+
+                if lado[H] == "right" then
+                    transition.to(animal, { time = 5000, delay = 0, x = animal.x + 500, transition = easing.linear, onComplete = function() animal:removeSelf() end })
+                elseif lado[H] == "left" then
+                    transition.to(animal, { time = 5000, delay = 0, x = animal.x - 500, transition = easing.linear, onComplete = function() animal:removeSelf() end})
+                elseif lado[H] == "up" then
+                    transition.to(animal, { time = 5000, delay = 0, y = animal.y - 500, transition = easing.linear, onComplete = function() animal:removeSelf() end})
+                elseif lado[H] == "down" then
+                    transition.to(animal, { time = 5000, delay = 0, y = animal.y + 500, transition = easing.linear, onComplete = function() animal:removeSelf() end})
+                end
+
                 obj2:removeSelf()
                 player.chave = false
                 numJaula = numJaula - 1
+
                 if numJaula <= 0 then
                     endgame()
                 end
@@ -377,9 +430,6 @@ function scene:create( event )
     bolha = display.newImageRect(controlesGroup, "images/bolha.png", 80, 80 )
     bolha.x, bolha.y, bolha.myName = buttons[1].x + tamTela + 90, buttons[2].y - 30, "bolha"
     ----------------------------------------------------------------------------------------------------
-
-    -- Cronometro contagem regressiva
-    secondsLeft = 30000  -- 10 minutes * 60 seconds
       
     -- Criando vidas do menu
     core1 = display.newImageRect(menuGroup, "images/coracao.png", 32, 30)
@@ -428,11 +478,11 @@ function scene:create( event )
     micoLeaoDourado.y = yTela / 4 - 10
     micoLeaoDourado.alpha = 0.5
 
-    
 
     --livesText = display.newText( menuGroup, "vidas: " .. lives, xTela - 180, yTela / 4 - 10, "Mario-Kart-DS", 36)
     --chaveText = display.newText( menuGroup, "chaves: " .. qtdChave, xTela + 180, yTela / 4 - 10, "Mario-Kart-DS", 36)
-    clockText = display.newText( menuGroup, "500", xTela + 245, yTela / 4 - 10, "Mario-Kart-DS", 36 )
+    --clockText = display.newText( menuGroup, tempo, xTela + 245, yTela / 4 - 10, "Mario-Kart-DS", 36 )
+    tempoText = display.newText( menuGroup, tempo, xTela + 245, yTela / 4 - 10, "Mario-Kart-DS", 36 )
 
     -- Atribuindo os grupos
     cenarioGroup:insert(backGroup)
@@ -471,8 +521,6 @@ function scene:create( event )
     
     bolha:addEventListener("touch", menuStatus)
 
-    
-   
 end
 
 
@@ -488,12 +536,12 @@ function scene:show( event )
         audio.setVolume( 0.2, { channel = 1} )
         trilhasonora = audio.loadSound( "audio/musicBack.mp3" , { channel=1, loops=-1, fadein=5000 })
         audio.play(trilhasonora)
-        
        
     elseif ( phase == "did" ) then
 
         Runtime:addEventListener("enterFrame", update)  -- Enterframe evento disparado o tempo todo
         Runtime:addEventListener( "collision", onCollision )
+        timer.performWithDelay( 1000, cronometro, 0 )
 
         --Importa o arquivo que faz os caçadores se movimentarem
         movimento = require( "gerador" )
