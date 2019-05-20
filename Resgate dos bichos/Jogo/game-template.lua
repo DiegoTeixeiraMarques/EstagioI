@@ -29,6 +29,8 @@ local passosY = 0                      -- Variável para controlar a movimentaç
 local qtdChave = 0                     -- Informa a quantiade de chaves já coletadas no jogo
 local cacadores = {}                   -- Tabela para adicionar todos os caçadores gerados e enviar para o arquivo "gerador.lua" fazer a movimentação deles
 local tempo = 500
+local pontuacao = 0
+animal = 0
 
 -- Quantidade de objetos do cenário
 local numChave = 7                     -- Quantidade de chaves criadas no início do jogo
@@ -165,12 +167,12 @@ local touchFunction = function(e)
 end
 
 -- Chamada após o gameOver
-function endGame()	
-    -- Redireciona para tela de menu
-    physics.pause()
-
-    composer.removeScene("score")								
-    composer.gotoScene("menu", { time=800, effect="crossFade" } )					
+function endGame()
+    pontuacao = pontuacao + tempo	
+    -- Cria variável acessivel para outra cena
+	composer.setVariable( "pontuacaoFinal", pontuacao )		
+	-- Redireciona para tela de Scores									
+    composer.gotoScene( "score", { time=800, effect="crossFade" } )					
 end
 
 -- Função chamada após contato com caçador
@@ -367,22 +369,25 @@ local function onCollision(event)
                 animal:play()
 
                 if lado[H] == "right" then
-                    transition.to(animal, { time = 5000, delay = 0, x = animal.x + 500, transition = easing.linear, onComplete = function() animal:removeSelf() end })
+                    transition.to(animal, { time = 3000, delay = 0, x = animal.x + 500, transition = easing.linear, onComplete = function() animal:removeSelf() end})
                 elseif lado[H] == "left" then
-                    transition.to(animal, { time = 5000, delay = 0, x = animal.x - 500, transition = easing.linear, onComplete = function() animal:removeSelf() end})
+                    transition.to(animal, { time = 3000, delay = 0, x = animal.x - 500, transition = easing.linear, onComplete = function() animal:removeSelf() end})
                 elseif lado[H] == "up" then
-                    transition.to(animal, { time = 5000, delay = 0, y = animal.y - 500, transition = easing.linear, onComplete = function() animal:removeSelf() end})
+                    transition.to(animal, { time = 3000, delay = 0, y = animal.y - 500, transition = easing.linear, onComplete = function() animal:removeSelf() end})
                 elseif lado[H] == "down" then
-                    transition.to(animal, { time = 5000, delay = 0, y = animal.y + 500, transition = easing.linear, onComplete = function() animal:removeSelf() end})
+                    transition.to(animal, { time = 3000, delay = 0, y = animal.y + 500, transition = easing.linear, onComplete = function() animal:removeSelf() end})
                 end
 
                 obj2:removeSelf()
                 player.chave = false
                 numJaula = numJaula - 1
 
+                pontuacao = pontuacao + 100  -- Animal liberado = +100 pontos
+
                 if numJaula <= 0 then
                     endgame()
                 end
+                
             end
         end
     end
@@ -410,7 +415,6 @@ function scene:create( event )
 
     local sceneGroup = self.view
     local phase = event.phase
-
 
     background = display.newImageRect( backGroup, "images/fundog.png", 3000, 3000 ) -- Definição de background
     background.x, background.y, background.myName = xTela, yTela, "background"
@@ -446,43 +450,37 @@ function scene:create( event )
     tartarugaOliva = display.newImageRect(menuGroup, "images/tartarugaOliva.png", 50, 50)
     tartarugaOliva.x = xTela - 150
     tartarugaOliva.y = yTela / 4 - 10
-    tartarugaOliva.alpha = 0.5
+    tartarugaOliva.alpha = 0.2
     
     araraAzul = display.newImageRect(menuGroup, "images/araraAzul.png", 50, 50)
     araraAzul.x = xTela - 100
     araraAzul.y = yTela / 4 - 10
-    araraAzul.alpha = 0.5
+    araraAzul.alpha = 0.2
 
     loboGuara = display.newImageRect(menuGroup, "images/loboGuara.png", 50, 45)
     loboGuara.x = xTela - 50
     loboGuara.y = yTela / 4 - 10
-    loboGuara.alpha = 0.5
+    loboGuara.alpha = 0.2
 
     macacoAranha = display.newImageRect(menuGroup, "images/macacoAranha.png", 50, 50)
     macacoAranha.x = xTela
     macacoAranha.y = yTela / 4 - 5
-    macacoAranha.alpha = 0.5
+    macacoAranha.alpha = 0.2
 
     oncaPintada = display.newImageRect(menuGroup, "images/oncaPintada.png", 40, 50)
     oncaPintada.x = xTela + 50
     oncaPintada.y = yTela / 4 -10
-    oncaPintada.alpha = 0.5
+    oncaPintada.alpha = 0.2
 
     guaruba = display.newImageRect(menuGroup, "images/guaruba.png", 50, 50)
     guaruba.x = xTela + 100
     guaruba.y = yTela / 4 - 10
-    guaruba.alpha = 0.5
+    guaruba.alpha = 0.2
 
     micoLeaoDourado = display.newImageRect(menuGroup, "images/micoLeaoDourado.png", 50, 50)
     micoLeaoDourado.x = xTela + 150
     micoLeaoDourado.y = yTela / 4 - 10
-    micoLeaoDourado.alpha = 0.5
-
-
-    --livesText = display.newText( menuGroup, "vidas: " .. lives, xTela - 180, yTela / 4 - 10, "Mario-Kart-DS", 36)
-    --chaveText = display.newText( menuGroup, "chaves: " .. qtdChave, xTela + 180, yTela / 4 - 10, "Mario-Kart-DS", 36)
-    --clockText = display.newText( menuGroup, tempo, xTela + 245, yTela / 4 - 10, "Mario-Kart-DS", 36 )
-    tempoText = display.newText( menuGroup, tempo, xTela + 245, yTela / 4 - 10, "Mario-Kart-DS", 36 )
+    micoLeaoDourado.alpha = 0.2
 
     -- Atribuindo os grupos
     cenarioGroup:insert(backGroup)
@@ -505,8 +503,6 @@ function scene:create( event )
     downY = yTela + background.height / 2 - 160 * 1.5
     bosque = {}
 
-
-
     -- Funcionalidades botoes
     buttons[1]:addEventListener("touch", touchFunction)
     buttons[2]:addEventListener("touch", touchFunction)
@@ -518,6 +514,8 @@ function scene:create( event )
     gerarArvore()
     gerarChave()
     gerarJaula()
+    trilhasonora = audio.loadSound( "audio/musicBack.mp3" )
+    tempoText = display.newText( menuGroup, tempo, xTela + 245, yTela / 4 - 10, "Mario-Kart-DS", 36 )
     
     bolha:addEventListener("touch", menuStatus)
 
@@ -531,17 +529,14 @@ function scene:show( event )
 	local phase = event.phase
 
     if ( phase == "will" ) then
-        
 		-- Definindo som de fundo
-        audio.setVolume( 0.2, { channel = 1} )
-        trilhasonora = audio.loadSound( "audio/musicBack.mp3" , { channel=1, loops=-1, fadein=5000 })
-        audio.play(trilhasonora)
+        audio.play( trilhasonora, { channel=1, loops=-1 } )	
        
     elseif ( phase == "did" ) then
 
         Runtime:addEventListener("enterFrame", update)  -- Enterframe evento disparado o tempo todo
         Runtime:addEventListener( "collision", onCollision )
-        timer.performWithDelay( 1000, cronometro, 0 )
+        cronometroJogo = timer.performWithDelay( 1000, cronometro, 0 )
 
         --Importa o arquivo que faz os caçadores se movimentarem
         movimento = require( "gerador" )
@@ -558,14 +553,17 @@ end
 
 -- hide()
 function scene:hide( event )
-
 	local sceneGroup = self.view
-	local phase = event.phase
-
-	if ( phase == "will" ) then
-
-    elseif ( phase == "did" ) then		
-
+    local phase = event.phase
+    if ( phase == "will" ) then
+		timer.cancel( cronometroJogo )
+	elseif ( phase == "did" ) then
+		-- Code here runs immediately after the scene goes entirely off screen
+        Runtime:removeEventListener( "collision", onCollision )
+        Runtime:removeEventListener("enterFrame", update)  -- Enterframe evento disparado o tempo todo
+		physics.pause()
+		audio.stop( 1 )
+        composer.removeScene("game-template")
 	end
 end
 
@@ -573,7 +571,9 @@ end
 -- destroy()
 function scene:destroy( event )
 
-	local sceneGroup = self.view
+    local sceneGroup = self.view
+    
+    audio.dispose( trilhasonora )
 
 end
 

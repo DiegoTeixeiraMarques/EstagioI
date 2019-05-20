@@ -26,7 +26,7 @@ function movimentoCacador(cacadores)
     
 
     function ponto_x1()
-        
+
         cacador1:setSequence("right")
         cacador1:play()
         transition.to(cacador1, { time = timeSet, delay = 0, x = cacador1.x + 500, transition = easing.linear })

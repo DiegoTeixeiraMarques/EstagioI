@@ -20,9 +20,14 @@ function scene:create( event )
     background.y = display.contentCenterY
 
 	-- Botões menu
-    local botaoJogar = display.newImageRect( sceneGroup, "images/botao_jogar.png", 250, 125)
-    botaoJogar.x = display.contentCenterX + 50
-	botaoJogar.y = display.contentCenterY - 100
+    local botaoJogar = display.newImageRect( sceneGroup, "images/botao_jogar.png", 477 / 2, 165 / 2)
+    botaoJogar.x = display.contentCenterX + 60
+	botaoJogar.y = display.contentCenterY - 70
+
+	local botaoScores = display.newImageRect( sceneGroup, "images/botao_scores.png", 477 / 2, 165 / 2)
+    botaoScores.x = display.contentCenterX + 60
+	botaoScores.y = display.contentCenterY + 50
+
 
 	-- Funcionalidades dos botões
 	botaoJogar:addEventListener("tap", gotoGame)
